@@ -1,2 +1,3 @@
-# Squiggles.jl
-GPU accelerated cross correlation
+![](resources/art/icon.png)
+
+Welcome to Squiggles.jl, a Julia package to accelerate 1D cross correlations of seismic signals using GPUs! 
