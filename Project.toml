@@ -1,0 +1,11 @@
+name = "Squiggles"
+uuid = "d934da09-a6a1-40ff-a16a-ac00174578b4"
+version = "0.1.0"
+authors = ["gbene <gabri.benedetti@gmail.com>"]
+
+[workspace]
+projects = ["docs"]
+
+
+[compat]
+julia = "1.11"
