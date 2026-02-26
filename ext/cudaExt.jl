@@ -1,0 +1,285 @@
+module cudaExt
+
+    using CUDA
+    using Squiggles
+
+
+    function Squiggles.set_GPUbackend(mem::String="device")
+
+        if mem == "device"
+            backend = HighSeas.CUDABackend("GPU", "CUDA", mem, CUDA.DeviceMemory)
+
+        elseif mem == "unified"
+            backend = HighSeas.CUDABackend("GPU", "CUDA", mem, CUDA.UnifiedMemory)
+
+        else
+            error(styled"Memory {bold:$mem} type not recognized")
+        end
+        println(styled"CUDA with {bold:$(backend.memory)} will now be used")
+
+
+
+        global_settings["backend"] = backend
+        return nothing
+    end
+
+
+    function Squiggles.pararellMax(cache::AbstractVector{T},
+                     lag_cache::AbstractVector{T},
+                     thread_index::Int,
+                     cache_length::Int,
+                     stride::Int) where T
+
+        offset = div(cache_length, 2)
+
+        while offset > 0
+            # We implement a grid stride loop to have reduction with any blockDim
+            for i = thread_index:stride:cache_length
+                if i <= offset
+                    @inbounds val = cache[i]
+                    @inbounds lag_val = lag_cache[i]
+                    @inbounds offset_val = cache[i+offset]
+                    @inbounds off_lag_val = lag_cache[i+offset]
+
+                    if offset_val > val
+
+                        @inbounds cache[i] = offset_val
+                        @inbounds lag_cache[i] = off_lag_val
+                    else
+                        @inbounds cache[i] = val
+                        @inbounds lag_cache[i] = lag_val
+                    end
+                end
+
+            end
+            sync_threads() # We wait for all threads to finish
+
+            offset >>= 1
+        end
+
+        return
+
+    end
+
+    function Squiggles.cc_kernel(
+        templates::CuDeviceArray{T},
+        signals::CuDeviceArray{T},
+        cc_mat::CuDeviceArray{T},
+        lag_mat::CuDeviceArray{T},
+        nlags::Int,
+        lag_len::Int) where {T}
+
+        size_template = size(templates, 1)
+        size_signal = size(signals, 1)
+
+
+        # Define the shmem size. It is the length of lags
+
+        template_block_index = blockIdx().x
+        signal_block_index = blockIdx().y
+
+        thread_index = threadIdx().x
+        stride = blockDim().x
+
+        # #The threads responsible for the lags are on the y
+
+        # thread_index = threadIdx().y
+        # stride = blockDim().y
+
+        # The threads responsible for the dot product are on the x
+        # dot_prod_stride = blockDim().x
+
+        # The shared memory is the sum of:
+        # 1. Number of lags x2 (one for the cc values one for the lag values)
+        # (2. Number of threads doing the dot product)
+        # 3. Size of the template + size of the signal
+
+        # shmem = @cuDynamicSharedMem(T, nlags+dot_prod_stride+n_elements*2)
+        shmem = @cuDynamicSharedMem(T, nlags*2+size_template+size_signal)
+
+
+        # start_dot_idx =  nlags+1
+        # end_dot_idx = nlags+dot_prod_stride
+
+        # start_templ_idx = end_dot_idx+1
+        # end_templ_idx = end_dot_idx+n_elements
+
+        # start_signal_idx = end_templ_idx+1
+        # end_signal_idx = end_templ_idx+n_elements
+
+        start_lag_idx = nlags+1
+        end_lag_idx = nlags+nlags
+
+        start_templ_idx = end_lag_idx+1
+        end_templ_idx = end_lag_idx+size_template
+
+        start_signal_idx = end_templ_idx+1
+        end_signal_idx = end_templ_idx+size_signal
+
+
+        # We slice the shmem in the different things we need
+        # view -> pointer to shmem memory address
+
+        cc_cache = view(shmem, 1:nlags)
+        lag_cache = view(shmem, start_lag_idx:end_lag_idx)
+        template = view(shmem, start_templ_idx:end_templ_idx)
+        signal = view(shmem, start_signal_idx:end_signal_idx)
+
+
+
+        # Move the signal and template in the shared memory
+
+        for i = thread_index:stride:size_template
+            @inbounds template[i] = templates[i, template_block_index]
+        end
+
+        for i = thread_index:stride:size_signal
+            @inbounds signal[i] = signals[i, signal_block_index]
+        end
+        sync_threads()
+
+        # Grid stride loop to calculate lags.
+        # We use a grid stride so that we can use any number of lags independently from the number of lunched threads
+
+        for i = thread_index:stride:nlags
+            lag = (i-1)-lag_len
+            @inbounds lag_cache[i] = lag
+            @inbounds cc_cache[i] =
+                lagged_dot(template, signal, size_template, size_signal, lag)
+        end
+
+
+        sync_threads()
+
+        # Define the max value of the calculated lags
+        pararellMax(cc_cache, lag_cache, thread_index, nlags, stride)
+
+        if thread_index == 1 # only the first thread is writing to the output
+
+            if cc_cache[end] > cc_cache[1]
+                cc_cache[1] = cc_cache[end]
+                lag_cache[1] = lag_cache[end]
+            end
+
+
+            @inbounds cc_mat[template_block_index, signal_block_index] = cc_cache[1]
+            @inbounds lag_mat[template_block_index, signal_block_index] = lag_cache[1]
+        end
+        return nothing
+
+    end
+
+    function Squiggles.ncc_kernel(
+        templates::CuDeviceArray{T},
+        signals::CuDeviceArray{T},
+        ncc_mat::CuDeviceArray{T},
+        lag_mat::CuDeviceArray{T},
+        norm_templates::CuDeviceArray{T},
+        norm_signals::CuDeviceArray{T},
+        nlags::Int,
+        lag_len::Int) where {T}
+
+        size_template = size(templates, 1)
+        size_signal = size(signals, 1)
+
+
+        # Define the shmem size. It is the length of lags
+
+        template_block_index = blockIdx().x
+        signal_block_index = blockIdx().y
+
+        thread_index = threadIdx().x
+        stride = blockDim().x
+
+        # #The threads responsible for the lags are on the y
+
+        # thread_index = threadIdx().y
+        # stride = blockDim().y
+
+        # The threads responsible for the dot product are on the x
+        # dot_prod_stride = blockDim().x
+
+        # The shared memory is the sum of:
+        # 1. Number of lags x2 (one for the cc values one for the lag values)
+        # (2. Number of threads doing the dot product)
+        # 3. Size of the template + size of the signal
+
+        # shmem = @cuDynamicSharedMem(T, nlags+dot_prod_stride+n_elements*2)
+        shmem = @cuDynamicSharedMem(T, nlags*2+size_template+size_signal)
+
+
+        # start_dot_idx =  nlags+1
+        # end_dot_idx = nlags+dot_prod_stride
+
+        # start_templ_idx = end_dot_idx+1
+        # end_templ_idx = end_dot_idx+n_elements
+
+        # start_signal_idx = end_templ_idx+1
+        # end_signal_idx = end_templ_idx+n_elements
+
+        start_lag_idx = nlags+1
+        end_lag_idx = nlags+nlags
+
+        start_templ_idx = end_lag_idx+1
+        end_templ_idx = end_lag_idx+size_template
+
+        start_signal_idx = end_templ_idx+1
+        end_signal_idx = end_templ_idx+size_signal
+
+
+        # We slice the shmem in the different things we need
+        # view -> pointer to shmem memory address
+
+        cc_cache = view(shmem, 1:nlags)
+        lag_cache = view(shmem, start_lag_idx:end_lag_idx)
+        template = view(shmem, start_templ_idx:end_templ_idx)
+        signal = view(shmem, start_signal_idx:end_signal_idx)
+
+
+
+        # Move the signal and template in the shared memory
+
+        for i = thread_index:stride:size_template
+            @inbounds template[i] = templates[i, template_block_index]
+        end
+
+        for i = thread_index:stride:size_signal
+            @inbounds signal[i] = signals[i, signal_block_index]
+        end
+        sync_threads()
+
+        # Grid stride loop to calculate lags.
+        # We use a grid stride so that we can use any number of lags independently from the number of lunched threads
+
+        for i = thread_index:stride:nlags
+            lag = (i-1)-lag_len
+            @inbounds lag_cache[i] = lag
+            @inbounds cc_cache[i] =
+                lagged_dot(template, signal, size_template, size_signal, lag)
+        end
+
+
+        sync_threads()
+
+        # Define the max value of the calculated lags
+        pararellMax(cc_cache, lag_cache, thread_index, nlags, stride)
+
+        if thread_index == 1 # only the first thread is writing to the output
+
+            if cc_cache[end] > cc_cache[1]
+                cc_cache[1] = cc_cache[end]
+                lag_cache[1] = lag_cache[end]
+            end
+
+            norm = norm_templates[template_block_index]*norm_signals[signal_block_index]
+
+            @inbounds ncc_mat[template_block_index, signal_block_index] = cc_cache[1]*norm
+            @inbounds lag_mat[template_block_index, signal_block_index] = lag_cache[1]
+        end
+        return nothing
+
+    end
+
+
+
+end
