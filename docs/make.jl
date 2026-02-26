@@ -1,4 +1,4 @@
-using Documenter, Fractalizer, CairoMakie
+using Documenter, Squiggles, CairoMakie
 
 pages = ["Home" => "index.md"]
 
