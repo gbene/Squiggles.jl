@@ -2,15 +2,17 @@ module cudaExt
 
     using CUDA
     using Squiggles
+    import Squiggles: set_GPUbackend, memcopy, lagged_dot, pararellMax, cc_kernel, ncc_kernel, cc, ncc
 
+    using StyledStrings
 
-    function Squiggles.set_GPUbackend(mem::String="device")
+    function set_GPUbackend(mem::String="device")
 
         if mem == "device"
-            backend = HighSeas.CUDABackend("GPU", "CUDA", mem, CUDA.DeviceMemory)
+            backend = Squiggles.CUDABackend("GPU", "CUDA", mem, CUDA.DeviceMemory)
 
         elseif mem == "unified"
-            backend = HighSeas.CUDABackend("GPU", "CUDA", mem, CUDA.UnifiedMemory)
+            backend = Squiggles.CUDABackend("GPU", "CUDA", mem, CUDA.UnifiedMemory)
 
         else
             error(styled"Memory {bold:$mem} type not recognized")
@@ -19,16 +21,30 @@ module cudaExt
 
 
 
-        global_settings["backend"] = backend
+        Squiggles.global_settings["backend"] = backend
         return nothing
     end
 
+    function memcopy(A::AbstractArray{T, N}, dev_id::Int=0) where {T, N}
+        mem = Squiggles.get_backend().memory
 
-    function Squiggles.pararellMax(cache::AbstractVector{T},
-                     lag_cache::AbstractVector{T},
-                     thread_index::Int,
-                     cache_length::Int,
-                     stride::Int) where T
+        prev_dev = device() # save current device
+
+        device!(dev_id) # change to selected device
+
+        A_cu = CuArray{T, N, mem}(A) # move to memory
+
+        device!(prev_dev) # change back to starting device
+
+        return A_cu
+    end
+
+
+    function pararellMax(cache::AbstractVector{T},
+                         lag_cache::AbstractVector{T},
+                         thread_index::Int32,
+                         cache_length::Int32,
+                         stride::Int32) where T
 
         offset = div(cache_length, 2)
 
@@ -61,13 +77,13 @@ module cudaExt
 
     end
 
-    function Squiggles.cc_kernel(
+    function cc_kernel(
         templates::CuDeviceArray{T},
         signals::CuDeviceArray{T},
         cc_mat::CuDeviceArray{T},
         lag_mat::CuDeviceArray{T},
-        nlags::Int,
-        lag_len::Int) where {T}
+        nlags::Int32,
+        lag_len::Int32) where {T}
 
         size_template = size(templates, 1)
         size_signal = size(signals, 1)
@@ -80,6 +96,8 @@ module cudaExt
 
         thread_index = threadIdx().x
         stride = blockDim().x
+
+        # @cuprintln("$(typeof(thread_index)), $(typeof(nlags)), $(typeof(stride))")
 
         # #The threads responsible for the lags are on the y
 
@@ -169,15 +187,15 @@ module cudaExt
 
     end
 
-    function Squiggles.ncc_kernel(
+    function ncc_kernel(
         templates::CuDeviceArray{T},
         signals::CuDeviceArray{T},
         ncc_mat::CuDeviceArray{T},
         lag_mat::CuDeviceArray{T},
         norm_templates::CuDeviceArray{T},
         norm_signals::CuDeviceArray{T},
-        nlags::Int,
-        lag_len::Int) where {T}
+        nlags::Int32,
+        lag_len::Int32) where {T}
 
         size_template = size(templates, 1)
         size_signal = size(signals, 1)
@@ -280,6 +298,49 @@ module cudaExt
 
     end
 
+
+    function cc(templates::AbstractArray{T}, signals::AbstractArray{T}, lag_length::Int, lag_threads::Int) where T
+
+        lag_length = Int32(lag_length)
+        lag_threads = Int32(lag_threads)
+
+        templates_c = memcopy(templates)
+        signals_c = memcopy(signals)
+
+        length_templates = size(templates, 1) # all templates must have the same length
+        length_signals = size(signals, 1) # all signals must have the same length
+
+
+        n_templates = size(templates, 2)
+        n_signals = size(signals, 2)
+
+
+        cc_mat = CUDA.zeros(T, n_templates, n_signals)
+        lag_mat = CUDA.zeros(T, n_templates, n_signals)
+
+        nlags = Int32((lag_length*2)+1)
+
+        threads = lag_threads
+
+        blocks = (n_templates, n_signals)
+
+        shmem = (nlags*2+length_templates+length_signals)*sizeof(T)
+
+        @cuda threads=threads blocks=blocks shmem=shmem cc_kernel(
+            templates_c,
+            signals_c,
+            cc_mat,
+            lag_mat,
+            nlags,
+            lag_length,
+        )
+
+        mat_cpu = memcopy(cc_mat)
+        lag_cpu = memcopy(lag_mat)
+
+        return mat_cpu, lag_cpu
+
+    end
 
 
 end
