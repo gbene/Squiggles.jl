@@ -5,6 +5,7 @@ using StyledStrings
 
 include("base.jl")
 include("backends.jl")
+include("signals.jl")
 include("device_functions.jl")
 include("kernels.jl")
 
