@@ -7,7 +7,7 @@ Squiggles.jl is a Julia package to accelerate 1D cross correlations of seismic s
 # Functions
 
 ```@docs
-get_backend
+used_backend
 ```
 
 ```@docs
@@ -19,11 +19,11 @@ get_available_GPUplatforms
 ```
 
 ```@docs
-set_CPUbackend
+use_CPUbackend
 ```
 
 ```@docs
-set_GPUbackend
+use_GPUbackend
 ```
 
 

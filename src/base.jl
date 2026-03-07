@@ -17,7 +17,7 @@ Overload this method with GPU specific Arrays using extensions
 using Squiggles
 using CUDA
 
-set_GPUbackend()
+use_GPUbackend()
 
 A = rand(256, 256)
 memcopy(A) # Copy A to the default device of an available backend
@@ -29,11 +29,11 @@ memcopy(A::AbstractGPUArray{T,N}) where {T, N} = Array{T, N}(A)
 
 """
 
-    set_backend(backend::AbstractBackend)
+    use_backend(backend::AbstractBackend)
 Internal function used to set the backend used to perform the calculations.
 Use the publicly available set_CPUbackend and set_GPUbackend to properly set the desired backend.
 """
-function set_backend(backend::AbstractBackend)
+function use_backend(backend::AbstractBackend)
     platform = backend.platform
 
     if platform in supported_platforms
@@ -47,7 +47,7 @@ end
 
 """
 
-    get_backend()
+    used_backend()
 
 Return the current backend used to perform the calculations.
 
@@ -56,18 +56,18 @@ Return the current backend used to perform the calculations.
 ```julia
 using Squiggles
 
-get_backend()
+used_backend()
 ```
 ```julia
 using Squiggles
 using CUDA
 
-set_GPUbackend()
+use_GPUbackend()
 
-get_backend()
+used_backend()
 ```
 """
-function get_backend()
+function used_backend()
     return global_settings["backend"]
 end
 
@@ -103,7 +103,7 @@ get_available_GPUplatforms() = display(supported_GPU_platforms)
 
 
 """
-    set_CPUbackend()
+    use_CPUbackend()
 
 Set the backend to CPU
 
@@ -113,15 +113,15 @@ Set the backend to CPU
 using Squiggles
 using CUDA
 
-set_CPUbackend()
+use_CPUbackend()
 ```
 """
-set_CPUbackend() = set_backend(CPUBackend())
+use_CPUbackend() = use_backend(CPUBackend())
 
 
 
 """
-    set_GPUbackend()
+    use_GPUbackend()
 
 Set the backend to the available GPU.
 
@@ -140,7 +140,7 @@ users can choose UnifiedMemory by running ```set_GPUbackend("unified")```
 using Squiggles
 using CUDA
 
-set_GPUbackend()
+use_GPUbackend()
 ```
 """
 function set_GPUbackend end

@@ -10,7 +10,7 @@ struct CPUBackend <: AbstractBackend
 
 end
 
-struct CUDABackend <: AbstractGPUBackend
+struct cudaBackend <: AbstractGPUBackend
 
     platform::String
     device::String
@@ -19,7 +19,7 @@ struct CUDABackend <: AbstractGPUBackend
 
 end
 
-struct ROCmBackend <: AbstractGPUBackend
+struct rocBackend <: AbstractGPUBackend
 
     platform::String
     device::String
@@ -28,7 +28,7 @@ struct ROCmBackend <: AbstractGPUBackend
 
 end
 
-struct MetalBackend <: AbstractGPUBackend
+struct metalBackend <: AbstractGPUBackend
 
     platform::String
     device::String
