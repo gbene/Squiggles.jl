@@ -2,17 +2,17 @@ module cudaExt
 
     using CUDA
     using Squiggles
-    import Squiggles: set_GPUbackend, memcopy, lagged_dot, pararellMax, cc_kernel, ncc_kernel, cc, ncc
+    import Squiggles: use_GPUbackend, memcopy, lagged_dot, pararellMax, cc_kernel, ncc_kernel, cc, ncc
 
     using StyledStrings
 
-    function set_GPUbackend(mem::String="device")
+    function use_GPUbackend(mem::String="device")
 
         if mem == "device"
-            backend = Squiggles.CUDABackend("GPU", "CUDA", mem, CUDA.DeviceMemory)
+            backend = Squiggles.cudaBackend("GPU", "CUDA", mem, CUDA.DeviceMemory)
 
         elseif mem == "unified"
-            backend = Squiggles.CUDABackend("GPU", "CUDA", mem, CUDA.UnifiedMemory)
+            backend = Squiggles.cudaBackend("GPU", "CUDA", mem, CUDA.UnifiedMemory)
 
         else
             error(styled"Memory {bold:$mem} type not recognized")

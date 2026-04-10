@@ -2,6 +2,7 @@ module Squiggles
 
 using GPUArrays
 using StyledStrings
+using Makie
 
 include("base.jl")
 include("backends.jl")
