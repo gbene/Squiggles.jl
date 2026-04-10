@@ -46,9 +46,11 @@ module cudaExt
                          cache_length::Int32,
                          stride::Int32) where T
 
-        offset = div(cache_length, 2)
+        # offset = div(cache_length, 2)
+        s_power = exponent(cache_length)-1 # get the exponent number of the cachelength (power of 2)
 
-        while offset > 0
+        for p in s_power:-1:-1
+            offset = 1<<p
             # We implement a grid stride loop to have reduction with any blockDim
             for i = thread_index:stride:cache_length
                 if i <= offset
@@ -70,7 +72,7 @@ module cudaExt
             end
             sync_threads() # We wait for all threads to finish
 
-            offset >>= 1
+            # offset >>= 1
         end
 
         return
@@ -342,5 +344,54 @@ module cudaExt
 
     end
 
+    function ncc(templates::AbstractArray{T}, signals::AbstractArray{T}, lag_length::Int, lag_threads::Int) where T
 
+        norm_values_templates = T.(1 ./ sqrt.(sum(templates .* templates, dims = 1)))
+        norm_values_signals = T.(1 ./ sqrt.(sum(signals .* signals, dims = 1)))
+
+        lag_length = Int32(lag_length)
+        lag_threads = Int32(lag_threads)
+
+        templates_c = memcopy(templates)
+        signals_c = memcopy(signals)
+        norm_values_templates_c = memcopy(norm_values_templates)
+        norm_values_signals_c = memcopy(norm_values_signals)
+
+
+        length_templates = size(templates, 1) # all templates must have the same length
+        length_signals = size(signals, 1) # all signals must have the same length
+
+
+        n_templates = size(templates, 2)
+        n_signals = size(signals, 2)
+
+
+        ncc_mat = memcopy(zeros(T, n_templates, n_signals))
+        lag_mat = memcopy(zeros(T, n_templates, n_signals))
+
+        nlags = Int32((lag_length*2)+1)
+
+        threads = lag_threads
+
+        blocks = (n_templates, n_signals)
+
+        shmem = (nlags*2+length_templates+length_signals)*sizeof(T)
+
+        @cuda threads=threads blocks=blocks shmem=shmem ncc_kernel(
+            templates_c,
+            signals_c,
+            ncc_mat,
+            lag_mat,
+            norm_values_templates_c,
+            norm_values_signals_c,
+            nlags,
+            lag_length,
+        )
+
+        mat_cpu = memcopy(ncc_mat)
+        lag_cpu = memcopy(lag_mat)
+
+        return mat_cpu, lag_cpu
+
+    end
 end
