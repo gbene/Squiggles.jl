@@ -47,6 +47,23 @@ function linear2tr_nodiag(k::Int, n::Int)
 
 end
 
+"""
+    diagonal_indexes(M)
+
+Get the diagonal linear indexes of a NxN matrix
+"""
+function diagonal_indexes(M::Matrix{T}) where {T}
+
+    N = size(M)[1]
+
+    indexes = zeros(T, N)
+
+    for k in 0:N-1
+        indexes[k+1] = 1+k*(N+1)
+    end
+
+    return indexes
+end
 
 """
     reduce_M
@@ -56,12 +73,12 @@ m will be of size N x (N+1)/2 (for N odd) or N/2 X (N+1) (for N even).
 
 
 """
-function reduce_M_nodiag(M::Matrix)
+function reduce_M_nodiag(M::Matrix{T}) where {T}
     N = size(M)[1]
 
     n_nodiag = N*(N-1) ÷ 2 # number of elements in the lower/upper triangle (excluding diagonal)
 
-    m = zeros(n_nodiag)
+    m = zeros(T, n_nodiag)
 
     for i in 1:n_nodiag
         m[i] = M[linear2tr_nodiag(i, N)]
@@ -87,29 +104,25 @@ Reconstruct a symmetrical matrix from a matrix representation of the lower trian
 
 """
 
-function reconstruct_nodiag(m)
+function reconstruct_nodiag(m::Matrix{T}) where T
 
     n_nodiag = length(m)
 
-    N = (1+sqrt(1+8*n_nodiag))/2
+    N = (1+Int(sqrt(1+8*n_nodiag)))÷2
+    M = zeros(T, N,N)
 
-    M = zeros(N,N)
+    M[diagonal_indexes(M)] .= 1
 
+    for c in 1:n_nodiag
+        i = linear2tr_nodiag(c, N)[1]
+        j = linear2tr_nodiag(c, N)[2]
 
-
-    for i in 1:N
-        for j in 1:N
-            if i == j
-                M[i,j] = 1
-            else
-                M[i,j] = 0
-                M[j,i] = 0
-            end
-        end
+        M[i,j] = m[c]
+        M[j,i] = m[c]
     end
 
 
-
+    return M
 end
 N = 8 # size of the square matrix
 
@@ -119,4 +132,4 @@ n_nodiag = N*(N-1) ÷ 2 # number of elements in the lower/upper triangle (exclud
 
 M = Matrix(reshape(1:N*N, (N,N)))
 
-m = reduce_M_nodiag(M)
+m = reduce_M_nodiag(M) # Reduce the symmetric matrix to the lower triangle (still as a matrix)
