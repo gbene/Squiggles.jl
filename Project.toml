@@ -4,7 +4,7 @@ version = "0.1.0"
 authors = ["gbene <gabri.benedetti@gmail.com>", "Ylse Anna de Vries <yad2@hi.is>"]
 
 [workspace]
-projects = ["docs", "tests/CUDA", "tests/Plots", "tests/tr_index"]
+projects = ["docs", "tests/kernelabstractions", "tests/Plots", "tests/tr_index", "test/macros"]
 
 [deps]
 GPUArrays = "0c68f7d7-f131-5f86-a1c3-88cf8149b2d7"

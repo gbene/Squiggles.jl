@@ -184,3 +184,52 @@ function AddNoise(signal, samp_freq,
 
     return signal
 end
+
+
+"""
+    SignalMatrix(sampling_rate, duration, n_signals, freq_range, padding, delay_range)
+
+Create a matrix of random signals. The matrix will have size sampling_rate x n_signals (rows x cols)
+
+### Arguments
+
+    -`sampling_rate::Int` -- Sampling rate of each signal
+    -`duration::Number` -- Duration (in s) of each signal
+    -`n_signals::Int` -- Number of signals
+    -`freq_range::Range` -- Frequency range used to form the signal
+    -`padding::Number` -- Amount of padding (in s) to add to the signals
+    -`delay_range::Range` -- Delay to add to each signal
+
+### Output
+
+Real valued signal matrix
+
+### Example
+
+`SignalMatrix(100, 1, 10, 1:20, 3, -2:0.25:2)`
+
+"""
+function SignalMatrix(sampling_rate, duration, n_signals, freq_range, padding, delay_range)
+
+    # sampling_rate = 100
+    # duration = 1 #s
+    # n_signals = 10
+
+    # freq_range = 1:20
+    phase_range = 0:0.1:duration
+    # padding = 3
+    # delay_range = -2:0.25:2
+
+    M = zeros(Float32, sampling_rate, n_signals)
+
+    for i in 1:n_signals
+        delay = rand(delay_range)
+        event, domain = RandomEvent(freq_range, phase_range, [1], sampling_rate, duration, 10)
+        trace, time_trace = AddPadding(event, sampling_rate, padding, delay)
+
+        template, ttime = ExtractSnippet(trace, time_trace, sampling_rate, padding+delay+0.3,padding+delay+duration-0.3)
+        M[:,i] = real(event)
+    end
+
+    return M
+end
