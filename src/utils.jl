@@ -1,12 +1,12 @@
 """
-    linear2tr_nodiag(k::Int, n::Int)
+    linear2tr_nodiag(k, n)
 
 Get the i, j index of the lower triangle (excluding the diagonal) of a matrix of size n x n from a linear index k. Matrix is col-wise ordered
 
 ### Arguments
 
-    -`k::Int` -- The linear index
-    -`n::Int` -- The size of the matrix (n x n)
+- `k::Int` -- The linear index
+- `n::Int` -- The size of the matrix (n x n)
 
 ### Notes
 https://atrebas.github.io/post/2021-01-17-index_to_lower_triangular_subscripts/
@@ -25,18 +25,19 @@ end
 
 
 """
-    reduce_M(M)
+    reduce_M_nodiag(M)
 
 Given a symmetric matrix **M** of size N x N (with N > 2), get a reduced matrix **m** of the lower triangle, excluding the diagonal.
 **m** will be of size N-1 x N/2 (for N even) or N X (N-1)/2 (for N odd).
 
 
 ### Arguments
-    -`M::Matrix` -- Input matrix of NxN
+
+- `M::Matrix` -- Input matrix of NxN
 
 ### Output
 
-    -`m::Matrix` -- Reduced matrix of N-1 x N/2 (for N even) or N X (N-1)/2 (for N odd).
+- `m::Matrix` -- Reduced matrix of N-1 x N/2 (for N even) or N X (N-1)/2 (for N odd).
 
 """
 function reduce_M_nodiag(M::Matrix{T}) where {T}
@@ -94,14 +95,13 @@ Given a reduced matrix **m** of size N-1 x N/2 (for N even) or N X (N-1)/2 (for 
 
 ### Arguments
 
-    -`m::Matrix` -- Reduced matrix of N-1 x N/2 (for N even) or N X (N-1)/2 (for N odd).
+- `m::Matrix` -- Reduced matrix of N-1 x N/2 (for N even) or N X (N-1)/2 (for N odd).
 
 ### Output
 
-    -`M::Matrix` -- Input matrix of NxN
+- `M::Matrix` -- Input matrix of NxN
 
 """
-
 function reconstruct_nodiag(m::Matrix{T}) where T
 
     n_nodiag = length(m)
@@ -126,7 +126,7 @@ end
 """
     normalize_columns(M)
 
-Normalize the columns of matrix (x/norm(x) where x is the column)
+Normalize the columns of a matrix M (x/norm(x) where x is the column)
 """
 function normalize_columns(M::Matrix{T}) where T
     norm_rep(x) = x/norm(x)
@@ -136,7 +136,13 @@ function normalize_columns(M::Matrix{T}) where T
 end
 
 
+"""
+    calculate_memory(A, B, τ)
+    calculate_memory(A, τ)
 
+
+Calculate the memory required to perform A⋆B or A⋆A
+"""
 function calculate_memory(A::AbstractArray{T}, B::AbstractArray{T}, τ::Int) where T
 
     A_size = sizeof(A)
@@ -170,5 +176,13 @@ function calculate_memory(A::AbstractArray{T}, τ::Int) where T
     out_size = prod(sz) * sizeof(T)
 
     return Base.format_bytes(A_size+out_size)
+
+end
+
+
+
+function assert_input(A::AbstractArray)
+
+    @assert ispow2(size(A,1)) "Cannot use signal lengths that are not power of 2!"
 
 end

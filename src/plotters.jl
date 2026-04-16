@@ -36,11 +36,13 @@ end
 
 """
     plotCC(cc_mat)
+
+Plot the correlation coefficient matrix
 """
 function plotCC(cc_mat)
 
     fig = Figure(size=(900,900))
-    ax = Axis(fig[1, 1], yreversed=true)
+    ax = Axis(fig[1, 1], yreversed=true, title="Correlation coefficient", ylabel="i", xlabel="j")
     heatmap!(ax, cc_mat)
 
     display(fig)
@@ -53,7 +55,7 @@ end
 """
     plotCorrelogram(correlograms)
 
-Interactive plot of the correlogram matrix.
+Interactive plot of the correlogram volume.
 
 """
 function plotCorrelogram(correlograms)
@@ -62,7 +64,7 @@ function plotCorrelogram(correlograms)
     n_signals, n_templates, n_lags = size(correlograms)
     corr_length = (n_lags-1)/2
     fig = Figure(size=(900,900))
-    ax = Axis3(fig[1, 1], xlabel="Lags", ylabel="Signal index", zlabel="Template index")
+    ax = Axis3(fig[1, 1], xlabel="Lags", ylabel="i", zlabel="j")
 
     sl_y = Slider(fig[2, 1], range = 1:n_signals, startvalue = 1)
     sl_z = Slider(fig[1, 2], range = 1:n_templates, startvalue = 1, horizontal=false)

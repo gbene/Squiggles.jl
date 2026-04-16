@@ -5,26 +5,38 @@
 
 
 Calculate the correlogram values for two signal matrices A (n_samples x n_signals) and B (n_samples x m_signals).
-Each signal in A is run across each signal in B. The lag interval is [-τ, τ]
-
-The resulting output will be a correlogram matrix of size (n_signals x m_signals x τ*2+1).
-Also one signal matrix can be used in the inputs. In such cases it is assumed
-`correlogram(A, A, τ, threads_per_block)` thus the output should be symmetric. To avoid
-extra computation then only the signal pairs of the lower triangle of the matrix will be outputted
+Each signal in A is run across each signal in B with lags ∈ [-τ, τ]
 
 
 ### Arguments
 
-    - `A::AbstractArray` -- n_samples x n_signals matrix
-    - `B::AbstractArray` -- n_samples x m_signals matrix
-    - `τ::Int` -- Lag length
-    - `threads_per_block` -- Number of threads per block
+- `A::AbstractArray` -- n_samples x n_signals matrix
+- `B::AbstractArray` -- n_samples x m_signals matrix
+- `τ::Int` -- Lag length
+- `threads_per_block` -- Number of threads per block
+
+### Outputs
+
+- `correlograms::AbstractArray{T, 3}` -- The correlogram volume of size (n_signals x m_signals x τ*2+1).
+
+### Notes
+
+Also one signal matrix can be used as input. In such cases it is assumed A⋆A thus to avoid
+extra computation, only correlations in the lower triangle will be carried out and the output will
+be of size N-1 x N/2 (for N even) or N X (N-1)/2 (for N odd).
+
+As of now only signals that have n samples as a power of 2 can be used. If this condition is not met an error is thrown
+
+
 """
 function correlogram(A::AbstractArray{T}, B::AbstractArray{T}, τ::Int, threads_per_block::Int) where T
+    assert_input(A)
+    assert_input(B)
 
     n_signals = size(A, 2)
     m_signals = size(B, 2)
     n_samples = size(A, 1)
+
 
     nlags = (τ * 2) + 1
 
@@ -51,6 +63,7 @@ end
 
 
 function correlogram(A::AbstractArray{T}, τ::Int, threads_per_block::Int) where T
+    assert_input(A)
 
     n_signals = size(A, 2)
     n_samples = size(A, 1)
@@ -96,23 +109,32 @@ end
 
 
 Calculate the normalized correlogram values for two signal matrices A (n_samples x n_signals) and B (n_samples x m_signals).
-Each signal in A is run across each signal in B. The lag interval is [-τ, τ]
-
-The resulting output will be a correlogram matrix of size (n_signals x m_signals x τ*2+1).
-Also one signal matrix can be used in the inputs. In such cases it is assumed
-`correlogram(A, A, τ, threads_per_block)` thus the output should be symmetric. To avoid
-extra computation then only the signal pairs of the lower triangle of the matrix will be outputted
-
+Each signal in A is run across each signal in B with lags ∈ [-τ, τ]
 
 
 ### Arguments
 
-    - `A::AbstractArray` -- n_samples x n_signals matrix
-    - `B::AbstractArray` -- n_samples x m_signals matrix
-    - `τ::Int` -- Lag length
-    - `threads_per_block` -- Number of threads per block
+- `A::AbstractArray` -- n_samples x n_signals matrix
+- `B::AbstractArray` -- n_samples x m_signals matrix
+- `τ::Int` -- Lag length
+- `threads_per_block` -- Number of threads per block
+
+### Outputs
+
+- `correlograms::AbstractArray{T, 3}` -- The correlogram volume fo size (n_signals x m_signals x τ*2+1).
+
+### Notes
+
+Also one signal matrix can be used as input. In such cases it is assumed A⋆A thus to avoid
+extra computation, only correlations in the lower triangle will be carried out and the output will
+be of size N-1 x N/2 (for N even) or N X (N-1)/2 (for N odd).
+
+As of now only signals that have n samples as a power of 2 can be used. If this condition is not met an error is thrown
+
 """
 function norm_correlogram(A::AbstractArray{T}, B::AbstractArray{T}, τ::Int, threads_per_block::Int) where T
+    assert_input(A)
+    assert_input(B)
 
     A_norm = normalize_columns(A)
     B_norm = normalize_columns(B)
@@ -123,6 +145,7 @@ function norm_correlogram(A::AbstractArray{T}, B::AbstractArray{T}, τ::Int, thr
 end
 
 function norm_correlogram(A::AbstractArray{T}, τ::Int, threads_per_block::Int) where T
+    assert_input(A)
 
     A_norm = normalize_columns(A)
 
@@ -134,10 +157,32 @@ end
 
 """
     simplelags(correlograms, τ)
+    simplelags(correlograms, τ, sampling_rate)
 
 
-Find the correlation or anticorrelation coeff and correspective lag as index position. These values correspond to the absolute
+Find the correlation or anticorrelation coeffs and correspective lag. These values correspond to the absolute
 maximum correlation value (preserving the original sign).
+### Arguments
+
+- `correlograms::AbstractArray{T, 3}` -- Correlogram volume
+- `τ::Int` -- lag length
+- `sampling_rate::Int` -- Sampling rate
+
+
+### Outputs
+
+- `coeffs::AbstractMatrix` -- Correlation coefficient matrix
+- `lags::AbstractMatrix` -- Lag matrix
+
+### Notes
+
+If the sampling rate is provided then the lags will be in seconds
+
+
+### Examples
+
+- ```simplelags(correlograms, 128)``` -- Lags will be integers
+- ```simplelags(correlograms, 128, 100)``` -- Lags will be in seconds
 
 """
 function simplelags(correlograms::AbstractArray{T, 3}, τ::Int) where T
@@ -145,5 +190,12 @@ function simplelags(correlograms::AbstractArray{T, 3}, τ::Int) where T
     coeffs = correlograms[idx]
     lags = map(x -> x[3] .- τ, idx) # the lags are the index - the amount of lag used
 
-    return coeffs, lags
+    return dropdims(coeffs, dims=3), dropdims(lags, dims=3)
+end
+
+function simplelags(correlograms::AbstractArray{T, 3}, τ::Int, sampling_rate::Int) where T
+
+    coeffs, lags = simplelags(correlograms, τ)
+
+    return coeffs, lags./sampling_rate
 end

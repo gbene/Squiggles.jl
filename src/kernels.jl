@@ -1,14 +1,16 @@
 """
-    correlogram_ak16(templates, signals, corr_length, correlograms)
+    correlogram_ak16(templates, signals, τ, correlograms)
+    correlogram_ak16(templates, τ, correlograms)
+
 
 Calculate correlograms for templates and signals that have 16 samples
 
 ### Arguments
 
-    -`templates::AbstractArray` -- Array of templates. This must be an array of 16 x ntemplates (rows x cols)
-    -`signals::AbstractArray` -- Array of signals. This must be an array of 16 x nsignals (rows x cols)
-    -`corr_length::Int` -- Length of samples to be correlated τ ∈ [-corr_length; corr_length].
-    -`correlograms::AbstractArray` -- Output array of correlograms. This must be of size ntemplates x nsignals x corr_length*2+1
+- `templates::AbstractArray` -- Array of templates. This must be an array of 16 x ntemplates (rows x cols)
+- `signals::AbstractArray` -- Array of signals. This must be an array of 16 x nsignals (rows x cols)
+- `τ::Int` -- Length of samples to be correlated [-τ; τ].
+- `correlograms::AbstractArray` -- Output array of correlograms. This must be of size ntemplates x nsignals x τ*2+1
 
 ### Output
 
@@ -16,13 +18,13 @@ This functions works inplace and will overwrite data in the `correlograms` matri
 
 ### Notes
 
-The `corr_length` the total number of lags that will be performed for the correlation. The lags will be symmetrical in respect to τ = 0 and thus will be
-corr_length*2+1. For example, using corr_length = 16 will slide the template from τ = -16 to τ = 16.
+`τ` controls the total number of lags that will be performed for the correlation. The lags will be symmetrical in respect to τ = 0 and thus will be
+τ*2+1. For example, using τ = 16 will slide the template from τ = -16 to τ = 16.
 
 """
 @kernel function correlogram_ak16(templates::AbstractArray{T},
                                    signals::AbstractArray{T},
-                                   corr_length::Int,
+                                   τ::Int,
                                    correlograms::AbstractArray{T},
                                    ) where T
 
@@ -35,7 +37,7 @@ corr_length*2+1. For example, using corr_length = 16 will slide the template fro
 end
 
 @kernel function correlogram_ak16(templates::AbstractArray{T},
-                                   corr_length::Int,
+                                   τ::Int,
                                    correlograms::AbstractArray{T},
                                    ) where T
 
@@ -47,16 +49,18 @@ end
 end
 
 """
-    correlogram_ak32(templates, signals, corr_length, correlograms)
+    correlogram_ak32(templates, signals, τ, correlograms)
+    correlogram_ak32(templates, τ, correlograms)
+
 
 Calculate correlograms for templates and signals that have 32 samples
 
 ### Arguments
 
-    -`templates::AbstractArray` -- Array of templates. This must be an array of 32 x ntemplates (rows x cols)
-    -`signals::AbstractArray` -- Array of signals. This must be an array of 32 x nsignals (rows x cols)
-    -`corr_length::Int` -- Length of samples to be correlated τ ∈ [-corr_length; corr_length].
-    -`correlograms::AbstractArray` -- Output array of correlograms. This must be of size ntemplates x nsignals x corr_length*2+1
+- `templates::AbstractArray` -- Array of templates. This must be an array of 32 x ntemplates (rows x cols)
+- `signals::AbstractArray` -- Array of signals. This must be an array of 32 x nsignals (rows x cols)
+- `τ::Int` -- Length of samples to be correlated [-τ; τ].
+- `correlograms::AbstractArray` -- Output array of correlograms. This must be of size ntemplates x nsignals x τ*2+1
 
 ### Output
 
@@ -64,13 +68,13 @@ This functions works inplace and will overwrite data in the `correlograms` matri
 
 ### Notes
 
-The `corr_length` the total number of lags that will be performed for the correlation. The lags will be symmetrical in respect to τ = 0 and thus will be
-corr_length*2+1. For example, using corr_length = 32 will slide the template from τ = -32 to τ = 32.
+`τ` controls the total number of lags that will be performed for the correlation. The lags will be symmetrical in respect to τ = 0 and thus will be
+τ*2+1. For example, using τ = 32 will slide the template from τ = -32 to τ = 32.
 
 """
 @kernel function correlogram_ak32(templates::AbstractArray{T},
                                    signals::AbstractArray{T},
-                                   corr_length::Int,
+                                   τ::Int,
                                    correlograms::AbstractArray{T},
                                    ) where T
 
@@ -83,7 +87,7 @@ corr_length*2+1. For example, using corr_length = 32 will slide the template fro
 end
 
 @kernel function correlogram_ak32(templates::AbstractArray{T},
-                                   corr_length::Int,
+                                   τ::Int,
                                    correlograms::AbstractArray{T},
                                    ) where T
 
@@ -95,16 +99,18 @@ end
 end
 
 """
-    correlogram_ak64(templates, signals, corr_length, correlograms)
+    correlogram_ak64(templates, signals, τ, correlograms)
+    correlogram_ak64(templates, τ, correlograms)
+
 
 Calculate correlograms for templates and signals that have 64 samples
 
 ### Arguments
 
-    -`templates::AbstractArray` -- Array of templates. This must be an array of 64 x ntemplates (rows x cols)
-    -`signals::AbstractArray` -- Array of signals. This must be an array of 64 x nsignals (rows x cols)
-    -`corr_length::Int` -- Length of samples to be correlated τ ∈ [-corr_length; corr_length].
-    -`correlograms::AbstractArray` -- Output array of correlograms. This must be of size ntemplates x nsignals x corr_length*2+1
+- `templates::AbstractArray` -- Array of templates. This must be an array of 64 x ntemplates (rows x cols)
+- `signals::AbstractArray` -- Array of signals. This must be an array of 64 x nsignals (rows x cols)
+- `τ::Int` -- Length of samples to be correlated [-τ; τ].
+- `correlograms::AbstractArray` -- Output array of correlograms. This must be of size ntemplates x nsignals x τ*2+1
 
 ### Output
 
@@ -112,13 +118,13 @@ This functions works inplace and will overwrite data in the `correlograms` matri
 
 ### Notes
 
-The `corr_length` the total number of lags that will be performed for the correlation. The lags will be symmetrical in respect to τ = 0 and thus will be
-corr_length*2+1. For example, using corr_length = 64 will slide the template from τ = -64 to τ = 64.
+`τ` controls the total number of lags that will be performed for the correlation. The lags will be symmetrical in respect to τ = 0 and thus will be
+τ*2+1. For example, using τ = 64 will slide the template from τ = -64 to τ = 64.
 
 """
 @kernel function correlogram_ak64(templates::AbstractArray{T},
                                    signals::AbstractArray{T},
-                                   corr_length::Int,
+                                   τ::Int,
                                    correlograms::AbstractArray{T},
                                    ) where T
 
@@ -131,7 +137,7 @@ corr_length*2+1. For example, using corr_length = 64 will slide the template fro
 end
 
 @kernel function correlogram_ak64(templates::AbstractArray{T},
-                                   corr_length::Int,
+                                   τ::Int,
                                    correlograms::AbstractArray{T},
                                    ) where T
 
@@ -146,16 +152,18 @@ end
 
 
 """
-    correlogram_ak128(templates, signals, corr_length, correlograms)
+    correlogram_ak128(templates, signals, τ, correlograms)
+    correlogram_ak128(templates, τ, correlograms)
+
 
 Calculate correlograms for templates and signals that have 128 samples
 
 ### Arguments
 
-    -`templates::AbstractArray` -- Array of templates. This must be an array of 128 x ntemplates (rows x cols)
-    -`signals::AbstractArray` -- Array of signals. This must be an array of 128 x nsignals (rows x cols)
-    -`corr_length::Int` -- Length of samples to be correlated τ ∈ [-corr_length; corr_length].
-    -`correlograms::AbstractArray` -- Output array of correlograms. This must be of size ntemplates x nsignals x corr_length*2+1
+- `templates::AbstractArray` -- Array of templates. This must be an array of 128 x ntemplates (rows x cols)
+- `signals::AbstractArray` -- Array of signals. This must be an array of 128 x nsignals (rows x cols)
+- `τ::Int` -- Length of samples to be correlated [-τ; τ].
+- `correlograms::AbstractArray` -- Output array of correlograms. This must be of size ntemplates x nsignals x τ*2+1
 
 ### Output
 
@@ -163,13 +171,13 @@ This functions works inplace and will overwrite data in the `correlograms` matri
 
 ### Notes
 
-The `corr_length` the total number of lags that will be performed for the correlation. The lags will be symmetrical in respect to τ = 0 and thus will be
-corr_length*2+1. For example, using corr_length = 128 will slide the template from τ = -128 to τ = 128.
+`τ` controls the total number of lags that will be performed for the correlation. The lags will be symmetrical in respect to τ = 0 and thus will be
+τ*2+1. For example, using τ = 128 will slide the template from τ = -128 to τ = 128.
 
 """
 @kernel function correlogram_ak128(templates::AbstractArray{T},
                                    signals::AbstractArray{T},
-                                   corr_length::Int,
+                                   τ::Int,
                                    correlograms::AbstractArray{T},
                                    ) where T
 
@@ -181,7 +189,7 @@ corr_length*2+1. For example, using corr_length = 128 will slide the template fr
 end
 
 @kernel function correlogram_ak128(templates::AbstractArray{T},
-                                   corr_length::Int,
+                                   τ::Int,
                                    correlograms::AbstractArray{T},
                                    ) where T
 
@@ -193,16 +201,18 @@ end
 end
 
 """
-    correlogram_ak256(templates, signals, corr_length, correlograms)
+    correlogram_ak256(templates, signals, τ, correlograms)
+    correlogram_ak256(templates, τ, correlograms)
+
 
 Calculate correlograms for templates and signals that have 256 samples
 
 ### Arguments
 
-    -`templates::AbstractArray` -- Array of templates. This must be an array of 256 x ntemplates (rows x cols)
-    -`signals::AbstractArray` -- Array of signals. This must be an array of 256 x nsignals (rows x cols)
-    -`corr_length::Int` -- Length of samples to be correlated τ ∈ [-corr_length; corr_length].
-    -`correlograms::AbstractArray` -- Output array of correlograms. This must be of size ntemplates x nsignals x corr_length*2+1
+- `templates::AbstractArray` -- Array of templates. This must be an array of 256 x ntemplates (rows x cols)
+- `signals::AbstractArray` -- Array of signals. This must be an array of 256 x nsignals (rows x cols)
+- `τ::Int` -- Length of samples to be correlated [-τ; τ].
+- `correlograms::AbstractArray` -- Output array of correlograms. This must be of size ntemplates x nsignals x τ*2+1
 
 ### Output
 
@@ -210,13 +220,13 @@ This functions works inplace and will overwrite data in the `correlograms` matri
 
 ### Notes
 
-The `corr_length` the total number of lags that will be performed for the correlation. The lags will be symmetrical in respect to τ = 0 and thus will be
-corr_length*2+1. For example, using corr_length = 256 will slide the template from τ = -256 to τ = 256.
+`τ` controls the total number of lags that will be performed for the correlation. The lags will be symmetrical in respect to τ = 0 and thus will be
+τ*2+1. For example, using τ = 256 will slide the template from τ = -256 to τ = 256.
 
 """
 @kernel function correlogram_ak256(templates::AbstractArray{T},
                                    signals::AbstractArray{T},
-                                   corr_length::Int,
+                                   τ::Int,
                                    correlograms::AbstractArray{T},
                                    ) where T
 
@@ -228,7 +238,7 @@ corr_length*2+1. For example, using corr_length = 256 will slide the template fr
 end
 
 @kernel function correlogram_ak256(templates::AbstractArray{T},
-                                   corr_length::Int,
+                                   τ::Int,
                                    correlograms::AbstractArray{T},
                                    ) where T
 
@@ -240,16 +250,18 @@ end
 end
 
 """
-    correlogram_ak512(templates, signals, corr_length, correlograms)
+    correlogram_ak512(templates, signals, τ, correlograms)
+    correlogram_ak512(templates, τ, correlograms)
+
 
 Calculate correlograms for templates and signals that have 512 samples
 
 ### Arguments
 
-    -`templates::AbstractArray` -- Array of templates. This must be an array of 512 x ntemplates (rows x cols)
-    -`signals::AbstractArray` -- Array of signals. This must be an array of 512 x nsignals (rows x cols)
-    -`corr_length::Int` -- Length of samples to be correlated τ ∈ [-corr_length; corr_length].
-    -`correlograms::AbstractArray` -- Output array of correlograms. This must be of size ntemplates x nsignals x corr_length*2+1
+- `templates::AbstractArray` -- Array of templates. This must be an array of 512 x ntemplates (rows x cols)
+- `signals::AbstractArray` -- Array of signals. This must be an array of 512 x nsignals (rows x cols)
+- `τ::Int` -- Length of samples to be correlated [-τ; τ].
+- `correlograms::AbstractArray` -- Output array of correlograms. This must be of size ntemplates x nsignals x τ*2+1
 
 ### Output
 
@@ -257,13 +269,13 @@ This functions works inplace and will overwrite data in the `correlograms` matri
 
 ### Notes
 
-The `corr_length` the total number of lags that will be performed for the correlation. The lags will be symmetrical in respect to τ = 0 and thus will be
-corr_length*2+1. For example, using corr_length = 512 will slide the template from τ = -512 to τ = 512.
+`τ` controls the total number of lags that will be performed for the correlation. The lags will be symmetrical in respect to τ = 0 and thus will be
+τ*2+1. For example, using τ = 512 will slide the template from τ = -512 to τ = 512.
 
 """
 @kernel function correlogram_ak512(templates::AbstractArray{T},
                                    signals::AbstractArray{T},
-                                   corr_length::Int,
+                                   τ::Int,
                                    correlograms::AbstractArray{T},
                                    ) where T
 
@@ -275,7 +287,7 @@ corr_length*2+1. For example, using corr_length = 512 will slide the template fr
 end
 
 @kernel function correlogram_ak512(templates::AbstractArray{T},
-                                   corr_length::Int,
+                                   τ::Int,
                                    correlograms::AbstractArray{T},
                                    ) where T
 
@@ -287,16 +299,18 @@ end
 end
 
 """
-    correlogram_ak128(templates, signals, corr_length, correlograms)
+    correlogram_ak1024(templates, signals, τ, correlograms)
+    correlogram_ak1024(templates, τ, correlograms)
+
 
 Calculate correlograms for templates and signals that have 1024 samples
 
 ### Arguments
 
-    -`templates::AbstractArray` -- Array of templates. This must be an array of 1024 x ntemplates (rows x cols)
-    -`signals::AbstractArray` -- Array of signals. This must be an array of 1024 x nsignals (rows x cols)
-    -`corr_length::Int` -- Length of samples to be correlated τ ∈ [-corr_length; corr_length].
-    -`correlograms::AbstractArray` -- Output array of correlograms. This must be of size ntemplates x nsignals x corr_length*2+1
+- `templates::AbstractArray` -- Array of templates. This must be an array of 1024 x ntemplates (rows x cols)
+- `signals::AbstractArray` -- Array of signals. This must be an array of 1024 x nsignals (rows x cols)
+- `τ::Int` -- Length of samples to be correlated [-τ; τ].
+- `correlograms::AbstractArray` -- Output array of correlograms. This must be of size ntemplates x nsignals x τ*2+1
 
 ### Output
 
@@ -304,13 +318,13 @@ This functions works inplace and will overwrite data in the `correlograms` matri
 
 ### Notes
 
-The `corr_length` the total number of lags that will be performed for the correlation. The lags will be symmetrical in respect to τ = 0 and thus will be
-corr_length*2+1. For example, using corr_length = 1024 will slide the template from τ = -1024 to τ = 1024.
+`τ` controls the total number of lags that will be performed for the correlation. The lags are symmetrical in respect to τ = 0 and thus will be
+τ*2+1. For example, using τ = 1024 will slide the template from τ = -1024 to τ = 1024.
 
 """
 @kernel function correlogram_ak1024(templates::AbstractArray{T},
                                    signals::AbstractArray{T},
-                                   corr_length::Int,
+                                   τ::Int,
                                    correlograms::AbstractArray{T},
                                    ) where T
 
@@ -322,7 +336,7 @@ corr_length*2+1. For example, using corr_length = 1024 will slide the template f
 end
 
 @kernel function correlogram_ak1024(templates::AbstractArray{T},
-                                   corr_length::Int,
+                                   τ::Int,
                                    correlograms::AbstractArray{T},
                                    ) where T
 

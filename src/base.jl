@@ -30,6 +30,7 @@ memcopy(A::AbstractGPUArray{T,N}) where {T, N} = Array{T, N}(A)
 """
 
     use_backend(backend::AbstractBackend)
+
 Internal function used to set the backend used to perform the calculations.
 Use the publicly available set_CPUbackend and set_GPUbackend to properly set the desired backend.
 """
@@ -103,7 +104,7 @@ get_available_GPUplatforms() = display(supported_GPU_platforms)
 
 
 """
-    use_CPUbackend()
+    set_CPUbackend()
 
 Set the backend to CPU
 
@@ -116,12 +117,12 @@ using CUDA
 use_CPUbackend()
 ```
 """
-use_CPUbackend() = use_backend(CPUBackend())
+set_CPUbackend() = use_backend(CPUBackend())
 
 
 
 """
-    use_GPUbackend()
+    set_GPUbackend()
 
 Set the backend to the available GPU.
 
@@ -146,7 +147,11 @@ use_GPUbackend()
 function set_GPUbackend end
 
 
+"""
+    get_kernel(nsamples)
 
+Get the KA kernel for the sample length
+"""
 function get_kernel(nsamples::Int)
 
     return kernels_dict[string(nsamples)]
