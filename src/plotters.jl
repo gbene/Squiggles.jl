@@ -32,3 +32,68 @@ function plotSignalMatrix(M::Matrix; sep_step=2, fig_display=false)
 
     return fig, ax
 end
+
+
+"""
+    plotCC(cc_mat)
+"""
+function plotCC(cc_mat)
+
+    fig = Figure(size=(900,900))
+    ax = Axis(fig[1, 1], yreversed=true)
+    heatmap!(ax, cc_mat)
+
+    display(fig)
+
+    return fig, ax
+
+end
+
+
+"""
+    plotCorrelogram(correlograms)
+
+Interactive plot of the correlogram matrix.
+
+"""
+function plotCorrelogram(correlograms)
+
+    perm_corrs = permutedims(correlograms,(3,1,2))
+    n_signals, n_templates, n_lags = size(correlograms)
+    corr_length = (n_lags-1)/2
+    fig = Figure(size=(900,900))
+    ax = Axis3(fig[1, 1], xlabel="Lags", ylabel="Signal index", zlabel="Template index")
+
+    sl_y = Slider(fig[2, 1], range = 1:n_signals, startvalue = 1)
+    sl_z = Slider(fig[1, 2], range = 1:n_templates, startvalue = 1, horizontal=false)
+    ax2 = Axis(fig[1,3], xlabel="Lags", ylabel="Correlation", title="Correlogram" )
+    ylims!(ax2, -1, 1)
+
+    points = lift(sl_y.value, sl_z.value) do y, z
+        [Point3f(-corr_length*1.1, y+0.5, z+0.5), Point3f(corr_length*1.1, y+0.5, z+0.5)]
+    end
+
+    text_pos = lift(sl_y.value, sl_z.value) do y, z
+        Point3f(-corr_length*1.1, y+0.5, z+0.5)
+    end
+
+    text_label = lift(sl_y.value, sl_z.value) do y, z
+        "$y,$z"
+    end
+
+    correlogram = lift(sl_y.value, sl_z.value) do y, z
+        perm_corrs[:,y,z]
+    end
+
+    lines!(ax, points, color = :black, )
+    textlabel!(ax, text_pos, text=text_label, fontsize = 15)
+    lines!(ax2,correlogram)
+
+
+    volume!(ax, (-corr_length,corr_length), (1,n_signals),(1,n_templates), perm_corrs, interpolate = false)
+
+    display(fig)
+
+    return fig, ax
+
+end

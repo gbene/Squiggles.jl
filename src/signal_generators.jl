@@ -107,7 +107,7 @@ function AddPadding(signal, samp_freq, s_of_padding, s_of_delay)
     padding = Int(s_of_padding*samp_freq)
     padded_signal = zeros(ComplexF64, n_samples+2*padding)
 
-    delay = Int(s_of_delay*samp_freq)
+    delay = Int(floor(s_of_delay*samp_freq))
     start_index = padding+delay
 
     end_index = start_index+n_samples
@@ -223,11 +223,11 @@ function SignalMatrix(sampling_rate, duration, n_signals, freq_range, padding, d
     M = zeros(Float32, sampling_rate, n_signals)
 
     for i in 1:n_signals
-        delay = rand(delay_range)
+        # delay = rand(delay_range)
         event, domain = RandomEvent(freq_range, phase_range, [1], sampling_rate, duration, 10)
-        trace, time_trace = AddPadding(event, sampling_rate, padding, delay)
+        # trace, time_trace = AddPadding(event, sampling_rate, padding, delay)
 
-        template, ttime = ExtractSnippet(trace, time_trace, sampling_rate, padding+delay+0.3,padding+delay+duration-0.3)
+        # template, ttime = ExtractSnippet(trace, time_trace, sampling_rate, padding+delay,padding+delay+duration)
         M[:,i] = real(event)
     end
 

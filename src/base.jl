@@ -145,5 +145,9 @@ use_GPUbackend()
 """
 function set_GPUbackend end
 
-function cc end
-function ncc end
+
+
+function get_kernel(nsamples::Int)
+
+    return kernels_dict[string(nsamples)]
+end

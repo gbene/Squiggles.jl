@@ -16,6 +16,7 @@ function lagged_dot(
 
     dot_prod = T(0)
 
+    # This loop can't be unrolled I think, because of the if statement
     for j = 1:size_template
         signal_index = lag+j
 
@@ -31,10 +32,13 @@ function lagged_dot(
 end
 
 
-"""
-    pararellMax(cache, lag_cache, thread_index, cache_length, stride)
 
-Calculate the maximum value using grid striding
 
-"""
-function pararellMax end
+
+# """
+#     pararellMax(cache, lag_cache, thread_index, cache_length, stride)
+
+# Calculate the maximum value using grid striding
+
+# """
+# function pararellMax end

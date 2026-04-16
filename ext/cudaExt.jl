@@ -16,7 +16,7 @@ module cudaExt
         else
             error(styled"Memory {bold:$mem} type not recognized")
         end
-        println(styled"CUDA with {bold:$(backend.memory)} will now be used")
+        @info styled"CUDA with {bold:$(backend.memory)} will now be used"
 
 
 
@@ -29,13 +29,18 @@ module cudaExt
 
         prev_dev = device() # save current device
 
-        device!(dev_id) # change to selected device
+        if prev_dev.handle != dev_id
 
-        A_cu = CuArray{T, N, mem}(A) # move to memory
+            device!(dev_id) # change to selected device
 
-        device!(prev_dev) # change back to starting device
+            A_cu = CuArray{T, N, mem}(A) # move to memory
 
-        return A_cu
+            device!(prev_dev) # change back to starting device
+            return A_cu
+        else
+            A_cu = CuArray{T, N, mem}(A) # move to memory
+            return A_cu
+        end
     end
 
 
