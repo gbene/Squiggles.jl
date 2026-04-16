@@ -26,3 +26,9 @@ correlograms_norm = memcopy(correlograms_norm_gpu)
 
 corr_fig, corr_ax = plotCorrelogram(correlograms)
 corrn_fig, corrn_ax = plotCorrelogram(correlograms_norm)
+
+coeffs_gpu, lags = simplelags(correlograms_norm_gpu, τ)
+
+coeffs = memcopy(coeffs_gpu)
+
+coeff_fig, coeff_ax = plotCC(coeffs[:,:])
