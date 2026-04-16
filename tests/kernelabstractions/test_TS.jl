@@ -1,3 +1,9 @@
+"""
+Calculate the correlograms for correlating 2 matrices of signals (i.e. do A⋆B). This is the
+more general version in which the final correlogram matrix will have size of Aₙ x Bₙ x nlags.
+"""
+
+
 using Squiggles
 using CUDA
 using GLMakie
@@ -64,54 +70,54 @@ end
 
 
 
-function localpararellMax(cache::AbstractVector{T},
-                     lag_cache::AbstractVector{T},
-                     thread_index::Int32,
-                     cache_length::Int32,
-                     stride::Int32) where T
+# function localpararellMax(cache::AbstractVector{T},
+#                      lag_cache::AbstractVector{T},
+#                      thread_index::Int32,
+#                      cache_length::Int32,
+#                      stride::Int32) where T
 
-        # offset = div(cache_length, 2)
-        s_power = exponent(cache_length)-1 # get the exponent number of the cachelength (power of 2)
+#         # offset = div(cache_length, 2)
+#         s_power = exponent(cache_length)-1 # get the exponent number of the cachelength (power of 2)
 
-        for p in s_power:-1:-1
-            offset = 1<<p
-            # We implement a grid stride loop to have reduction with any blockDim
-            for i = thread_index:stride:cache_length
-                if i <= offset
-                    @inbounds val = cache[i]
-                    @inbounds lag_val = lag_cache[i]
-                    @inbounds offset_val = cache[i+offset]
-                    @inbounds off_lag_val = lag_cache[i+offset]
+#         for p in s_power:-1:-1
+#             offset = 1<<p
+#             # We implement a grid stride loop to have reduction with any blockDim
+#             for i = thread_index:stride:cache_length
+#                 if i <= offset
+#                     @inbounds val = cache[i]
+#                     @inbounds lag_val = lag_cache[i]
+#                     @inbounds offset_val = cache[i+offset]
+#                     @inbounds off_lag_val = lag_cache[i+offset]
 
-                    if offset_val > val
+#                     if offset_val > val
 
-                        @inbounds cache[i] = offset_val
-                        @inbounds lag_cache[i] = off_lag_val
-                    else
-                        @inbounds cache[i] = val
-                        @inbounds lag_cache[i] = lag_val
-                    end
-                end
+#                         @inbounds cache[i] = offset_val
+#                         @inbounds lag_cache[i] = off_lag_val
+#                     else
+#                         @inbounds cache[i] = val
+#                         @inbounds lag_cache[i] = lag_val
+#                     end
+#                 end
 
-            end
-            @synchronize()
-        end
-end
-
-
+#             end
+#             @synchronize()
+#         end
+# end
 
 
 
-n_templates = 2000
-n_signals = 2000
+
+
+n_templates = 10
+n_signals = 10
 
 n_samples = 128
 
 corr_length = 128 # How many samples are correlated
 nlags = (corr_length*2)+1 # total number of lags being correlated (symmetric + assuming power of 2 i.e. always even)
 
-templates = SignalMatrix(n_samples, 1, n_templates, 1:20, 3, -2:0.25:2)
-signals = SignalMatrix(n_samples, 1, n_signals, 1:20, 3, -2:0.25:2)
+templates = SignalMatrix(n_samples, 1, n_templates, 1:20, 1, -0.5:0.1:0.5)
+signals = SignalMatrix(n_samples, 1, n_signals, 1:20, 1, -0.5:0.1:0.5)
 
 norm_templates = Squiggles.normalize_columns(templates)
 norm_signals = Squiggles.normalize_columns(signals)

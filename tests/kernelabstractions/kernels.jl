@@ -57,7 +57,77 @@ import KernelAbstractions.Extras.@unroll
     end
 end
 
+@def optimized_kernel_template begin
 
+    n_lags = corr_length*2 +1
+
+    size_template = size_signal = size(templates, 1)
+    N = size(templates, 2)
+
+
+    n, m = @index(Group, NTuple)
+    linear_block_index = @index(Group, Linear)
+    thread_index = @index(Local)
+    stride = @groupsize()[1]
+
+
+
+    template_block_index, signal_block_index = linear2tr_nodiag(linear_block_index, N)
+
+    # if thread_index == 1
+    #     @print("$linear_block_index, ($template_block_index, $signal_block_index)\n")
+    # end
+    end_templ_idx = size_template
+
+    start_signal_idx = end_templ_idx+1
+    end_signal_idx = end_templ_idx+size_template
+
+
+    # We slice the shmem in the different things we need
+    # view -> pointer to shmem memory address
+
+    template = view(shmem, 1:end_templ_idx)
+    signal = view(shmem, start_signal_idx:end_signal_idx)
+
+
+
+    # Move the signal and template in the shared memory
+
+    # @unroll
+    @unroll for i = thread_index:stride:size_template
+        @inbounds template[i] = templates[i, template_block_index]
+    end
+
+    @unroll for i = thread_index:stride:size_signal
+        @inbounds signal[i] = templates[i, signal_block_index]
+    end
+
+    @synchronize()
+
+    # Grid stride loop to calculate lags.
+    # We use a grid stride so that we can use any number of lags independently from the number of lunched threads
+
+    # @unroll
+    @unroll for i = thread_index:stride:n_lags
+        lag = (i-1)-corr_length
+        # @print("$lag")
+        # @inbounds lag_cache[i] = lag
+        @inbounds correlograms[n, m, i] = locallagged_dot(template, signal, size_template, size_template, lag)
+    end
+end
+
+
+function linear2tr_nodiag(k::Integer, n::Integer)
+
+    kp = n * (n - 1) ÷ 2 - k
+    p = floor(Int, ( sqrt(1 + 8 * kp) - 1 ) / 2 )
+
+    i = n - (kp - p * (p + 1) ÷ 2)
+    j = n - 1 - p
+
+    return (i, j)
+
+end
 function locallagged_dot(
     template::AbstractVector{T},
     signal::AbstractVector{T},
@@ -80,7 +150,6 @@ function locallagged_dot(
 
     return dot_prod
 end
-
 
 
 # @kernel function correlogram_ak128(templates::AbstractArray{T},
@@ -288,5 +357,102 @@ corr_length*2+1. For example, using corr_length = 128 will slide the template fr
     shmem = @localmem Float32 128*2
 
     @kernel_template
+
+end
+
+@kernel function correlogram_ak128(templates::AbstractArray{T},
+                                   corr_length::Int,
+                                   correlograms::AbstractArray{T},
+                                   ) where T
+
+
+    # nsamples = 128
+    shmem = @localmem Float32 128*2
+
+    @optimized_kernel_template
+
+end
+
+
+@kernel function correlogram_ak256(templates::AbstractArray{T},
+                                   signals::AbstractArray{T},
+                                   corr_length::Int,
+                                   correlograms::AbstractArray{T},
+                                   ) where T
+
+
+    # nsamples = 128
+    shmem = @localmem Float32 256*2
+
+    @kernel_template
+
+end
+
+@kernel function correlogram_ak256(templates::AbstractArray{T},
+                                   corr_length::Int,
+                                   correlograms::AbstractArray{T},
+                                   ) where T
+
+
+    # nsamples = 128
+    shmem = @localmem Float32 256*2
+
+    @optimized_kernel_template
+
+end
+
+
+@kernel function correlogram_ak512(templates::AbstractArray{T},
+                                   signals::AbstractArray{T},
+                                   corr_length::Int,
+                                   correlograms::AbstractArray{T},
+                                   ) where T
+
+
+    # nsamples = 128
+    shmem = @localmem Float32 512*2
+
+    @kernel_template
+
+end
+
+@kernel function correlogram_ak512(templates::AbstractArray{T},
+                                   corr_length::Int,
+                                   correlograms::AbstractArray{T},
+                                   ) where T
+
+
+    # nsamples = 128
+    shmem = @localmem Float32 512*2
+
+    @optimized_kernel_template
+
+end
+
+
+@kernel function correlogram_ak1024(templates::AbstractArray{T},
+                                   signals::AbstractArray{T},
+                                   corr_length::Int,
+                                   correlograms::AbstractArray{T},
+                                   ) where T
+
+
+    # nsamples = 128
+    shmem = @localmem Float32 1024*2
+
+    @kernel_template
+
+end
+
+@kernel function correlogram_ak1024(templates::AbstractArray{T},
+                                   corr_length::Int,
+                                   correlograms::AbstractArray{T},
+                                   ) where T
+
+
+    # nsamples = 128
+    shmem = @localmem Float32 1024*2
+
+    @optimized_kernel_template
 
 end
