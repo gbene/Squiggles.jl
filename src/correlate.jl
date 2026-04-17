@@ -51,7 +51,7 @@ function correlogram(A::AbstractArray{T}, B::AbstractArray{T}, τ::Int, threads_
 
     A_gpu = memcopy(A, device)
     B_gpu = memcopy(B, device)
-    correlograms_gpu = memcopy(correlograms)
+    correlograms_gpu = memcopy(correlograms, device)
 
     kernel = get_kernel(n_samples)(get_backend(A_gpu))
 
@@ -91,7 +91,7 @@ function correlogram(A::AbstractArray{T}, τ::Int, threads_per_block::Int; devic
     ndrange = nthreads .* blocks # Total number of threads that need to be launched i.e. nthreads*blocks
 
     A_gpu = memcopy(A, device)
-    correlograms_gpu = memcopy(correlograms)
+    correlograms_gpu = memcopy(correlograms, device)
 
 
     kernel = get_kernel(n_samples)(get_backend(A_gpu))
