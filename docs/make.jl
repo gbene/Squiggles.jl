@@ -6,7 +6,8 @@ pages = ["Home" => "index.md",
          "Correlograms, coefficients and lags" => "correlate.md",
          "Available kernels" => "kernels.md",
          "Utilities" => "utils.md",
-         "Plotting" => "plotters.md"
+         "Plotting" => "plotters.md",
+         "API index" => "api.md"
         ]
 
 makedocs(sitename="Squiggles.jl", pages=pages, clean=true)

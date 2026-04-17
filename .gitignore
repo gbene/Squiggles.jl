@@ -1,3 +1,4 @@
 Manifest.toml
 LocalPreferences.toml
 .fuse*
+docs/build/
