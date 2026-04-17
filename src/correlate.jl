@@ -29,7 +29,7 @@ As of now only signals that have n samples as a power of 2 can be used. If this 
 
 
 """
-function correlogram(A::AbstractArray{T}, B::AbstractArray{T}, τ::Int, threads_per_block::Int) where T
+function correlogram(A::AbstractArray{T}, B::AbstractArray{T}, τ::Int, threads_per_block::Int; device=0) where T
     assert_input(A)
     assert_input(B)
 
@@ -49,8 +49,8 @@ function correlogram(A::AbstractArray{T}, B::AbstractArray{T}, τ::Int, threads_
     ndrange = nthreads .* blocks # Total number of threads that need to be launched i.e. nthreads*blocks
 
 
-    A_gpu = memcopy(A)
-    B_gpu = memcopy(B)
+    A_gpu = memcopy(A, device)
+    B_gpu = memcopy(B, device)
     correlograms_gpu = memcopy(correlograms)
 
     kernel = get_kernel(n_samples)(get_backend(A_gpu))
@@ -62,7 +62,7 @@ function correlogram(A::AbstractArray{T}, B::AbstractArray{T}, τ::Int, threads_
 end
 
 
-function correlogram(A::AbstractArray{T}, τ::Int, threads_per_block::Int) where T
+function correlogram(A::AbstractArray{T}, τ::Int, threads_per_block::Int; device=0) where T
     assert_input(A)
 
     n_signals = size(A, 2)
@@ -90,7 +90,7 @@ function correlogram(A::AbstractArray{T}, τ::Int, threads_per_block::Int) where
 
     ndrange = nthreads .* blocks # Total number of threads that need to be launched i.e. nthreads*blocks
 
-    A_gpu = memcopy(A)
+    A_gpu = memcopy(A, device)
     correlograms_gpu = memcopy(correlograms)
 
 
@@ -132,24 +132,24 @@ be of size N-1 x N/2 (for N even) or N X (N-1)/2 (for N odd).
 As of now only signals that have n samples as a power of 2 can be used. If this condition is not met an error is thrown
 
 """
-function norm_correlogram(A::AbstractArray{T}, B::AbstractArray{T}, τ::Int, threads_per_block::Int) where T
+function norm_correlogram(A::AbstractArray{T}, B::AbstractArray{T}, τ::Int, threads_per_block::Int; device=0) where T
     assert_input(A)
     assert_input(B)
 
     A_norm = normalize_columns(A)
     B_norm = normalize_columns(B)
 
-    return correlogram(A_norm, B_norm, τ, threads_per_block)
+    return correlogram(A_norm, B_norm, τ, threads_per_block, device=device)
 
 
 end
 
-function norm_correlogram(A::AbstractArray{T}, τ::Int, threads_per_block::Int) where T
+function norm_correlogram(A::AbstractArray{T}, τ::Int, threads_per_block::Int; device) where T
     assert_input(A)
 
     A_norm = normalize_columns(A)
 
-    return correlogram(A_norm, τ, threads_per_block)
+    return correlogram(A_norm, τ, threads_per_block, device=device)
 
 
 end
