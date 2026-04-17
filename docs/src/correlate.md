@@ -15,3 +15,15 @@ norm_correlogram
 ```@docs
 simplelags
 ```
+
+```@docs
+correlogram!
+```
+
+```@docs
+norm_correlogram!
+```
+
+```@docs
+simplelags!
+```

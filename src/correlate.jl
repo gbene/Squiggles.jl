@@ -62,6 +62,10 @@ function correlogram(A::AbstractArray{T}, B::AbstractArray{T}, τ::Integer, thre
 end
 
 
+
+
+
+
 function correlogram(A::AbstractArray{T}, τ::Integer, threads_per_block::Integer; device::Integer=0) where T
     assert_input(A)
 
@@ -102,6 +106,50 @@ function correlogram(A::AbstractArray{T}, τ::Integer, threads_per_block::Intege
 
 end
 
+
+"""
+    correlogram!(correlograms, A, B, τ, threads_per_block)
+    correlogram!(correlograms, A, τ, threads_per_block)
+
+Inplace version of the [`correlogram`](@ref) function.
+
+### Notes
+
+This assumes that the inputs are already moved to the device, use [`prepare_inputs`](@ref)
+"""
+function correlogram!(correlograms::AbstractArray{T, 3}, A::AbstractArray{T}, B::AbstractArray{T}, τ::Integer, threads_per_block::Integer) where T
+    assert_input(A)
+    assert_input(B)
+
+
+    n_samples = size(A, 1)
+
+    nthreads = (threads_per_block, 1)
+    blocks = size(correlograms)[1:2]
+
+    ndrange = nthreads .* blocks # Total number of threads that need to be launched i.e. nthreads*blocks
+
+    kernel = get_kernel(n_samples)(get_backend(A))
+
+    kernel(A, B, τ, correlograms, ndrange=ndrange, workgroupsize=nthreads)
+
+end
+
+function correlogram!(correlograms::AbstractArray{T, 3}, A::AbstractArray{T}, τ::Integer, threads_per_block::Integer) where T
+    assert_input(A)
+
+    n_samples = size(A, 1)
+
+    nthreads = (threads_per_block, 1)
+    blocks = size(correlograms)[1:2]
+
+    ndrange = nthreads .* blocks # Total number of threads that need to be launched i.e. nthreads*blocks
+
+    kernel = get_kernel(n_samples)(get_backend(A))
+
+    kernel(A, τ, correlograms, ndrange=ndrange, workgroupsize=nthreads)
+
+end
 
 """
     norm_correlogram(A, B, τ, threads_per_block)
@@ -156,6 +204,38 @@ end
 
 
 """
+    norm_correlogram!(correlograms, A, B, τ, threads_per_block)
+    norm_correlogram!(correlograms, A, τ, threads_per_block)
+
+Inplace version of the [`norm_correlogram`](@ref) function.
+
+### Notes
+
+This assumes that the inputs are already moved to the device, use [`prepare_inputs`](@ref)
+"""
+function norm_correlogram!(correlograms::AbstractArray{T, 3}, A::AbstractArray{T}, B::AbstractArray{T}, τ::Integer, threads_per_block::Integer) where T
+    assert_input(A)
+    assert_input(B)
+
+    A_norm = normalize_columns(A)
+    B_norm = normalize_columns(B)
+
+    correlogram!(correlograms, A_norm, B_norm, τ, threads_per_block)
+
+end
+
+function norm_correlogram!(correlograms::AbstractArray{T, 3}, A::AbstractArray{T}, τ::Integer, threads_per_block::Integer) where T
+    assert_input(A)
+
+    A_norm = normalize_columns(A)
+
+    correlogram!(correlograms, A_norm, τ, threads_per_block)
+
+
+end
+
+
+"""
     simplelags(correlograms, τ)
     simplelags(correlograms, τ, sampling_rate)
 
@@ -186,7 +266,7 @@ If the sampling rate is provided then the lags will be in seconds
 
 """
 function simplelags(correlograms::AbstractArray{T, 3}, τ::Integer) where T
-    idx = findmax(abs,correlograms, dims=3)[2] # get the index of the absolute maximums
+    idx = findmax(abs, correlograms, dims=3)[2] # get the index of the absolute maximums
     coeffs = correlograms[idx]
     lags = map(x -> x[3] .- τ, idx) # the lags are the index - the amount of lag used
 
@@ -198,4 +278,29 @@ function simplelags(correlograms::AbstractArray{T, 3}, τ::Integer, sampling_rat
     coeffs, lags = simplelags(correlograms, τ)
 
     return coeffs, lags./sampling_rate
+end
+
+
+"""
+    simplelags!(coeffs, lags, correlograms, τ)
+    simplelags!(coeffs, lags, correlograms, τ, sampling_rate)
+
+Inplace version of the [`simplelags`](@ref) function.
+
+### Notes
+
+This assumes that the inputs are already moved to the device, use [`prepare_inputs`](@ref)
+"""
+function simplelags!(coeffs::AbstractArray{T}, lags::AbstractArray{T}, correlograms::AbstractArray{T, 3}, τ::Integer) where T
+    idx = findmax(abs, correlograms, dims=3)[2] # get the index of the absolute maximums
+    coeffs .= correlograms[idx]
+    map!(x -> x[3] .- τ, lags, idx) # the lags are the index - the amount of lag used
+
+end
+
+function simplelags!(coeffs::AbstractArray{T}, lags::AbstractArray{T}, correlograms::AbstractArray{T, 3}, τ::Integer, sampling_rate::Integer) where T
+
+    simplelags!(coeffs, lags, correlograms, τ)
+
+    lags ./= sampling_rate
 end

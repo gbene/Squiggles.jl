@@ -8,6 +8,10 @@ memcopy
 ```
 
 ```@docs
+prepare_inputs
+```
+
+```@docs
 get_available_GPUplatforms
 ```
 

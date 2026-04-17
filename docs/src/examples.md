@@ -123,3 +123,7 @@ coeff_fig, coeff_ax = plotCC(coeffs)
 
 display(corrn_fig)
 ```
+
+## 4. Using a muliple GPUs
+
+Squiggles has the possibility of running the [correlogram](@ref) and [norm_correlogram](@ref) function  

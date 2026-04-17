@@ -128,7 +128,7 @@ end
 
 Normalize the columns of a matrix M (x/norm(x) where x is the column)
 """
-function normalize_columns(M::Matrix{T}) where T
+function normalize_columns(M::AbstractMatrix{T}) where T
     norm_rep(x) = x/norm(x)
 
     return mapslices(norm_rep, M, dims=1)
@@ -184,5 +184,89 @@ end
 function assert_input(A::AbstractArray)
 
     @assert ispow2(size(A,1)) "Cannot use signal lengths that are not power of 2!"
+
+end
+
+"""
+    prepare_inputs(A, B, τ; device=0)
+    prepare_inputs(A, τ; device=0)
+
+Preallocate the inputs for [`correlogram!`](@ref), [`norm_correlogram!`](@ref) and [`simplelags!`](@ref) on device.
+
+### Arguments
+
+- `A::AbstractArray{T}` -- Signal matrix A
+- `B::AbstractArray{T}` -- Signal matrix B
+- `τ::Integer` -- Lag length
+- `device::Integer` -- Device to copy the data
+
+### Outputs
+
+- `A_gpu::AbstractGPUArray{T}` -- Signal matrix A pointer on the device
+- `B_gpu::AbstractGPUArray{T}` -- Signal matrix B pointer on the device
+- `c_GPU::AbstractGPUArray{T, 3}` -- Empty correlogram volume pointer on the device
+- `coeffs_GPU::AbstractGPUArray{T}` -- Empty correlation coefficient matrix pointer on the device
+- `lags_GPU::AbstractGPUArray{T}` -- Empty lag matrix pointer on the device
+"""
+function prepare_inputs(A::AbstractArray{T}, B::AbstractArray{T}, τ::Integer; device::Integer=0) where T
+
+    assert_input(A)
+    assert_input(B)
+
+
+    n_signals = size(A, 2)
+    m_signals = size(B, 2)
+
+
+    nlags = (τ * 2) + 1
+
+    correlograms = zeros(T, n_signals, m_signals, nlags)
+
+    coeffs = zeros(T, n_signals, m_signals)
+    lags   = zeros(T, n_signals, m_signals)
+
+    A_gpu = memcopy(A, device)
+    B_gpu = memcopy(B, device)
+    c_GPU = memcopy(correlograms, device)
+    coeffs_GPU = memcopy(coeffs, device)
+    lags_GPU = memcopy(lags, device)
+
+    return A_gpu, B_gpu, c_GPU, coeffs_GPU, lags_GPU
+
+
+end
+
+function prepare_inputs(A::AbstractArray{T}, τ::Integer; device::Integer=0) where T
+    assert_input(A)
+
+    n_signals = size(A, 2)
+
+
+    nlags = (τ * 2) + 1
+
+    sz = (n_signals, n_signals, nlags)
+
+    if iseven(n_signals)
+
+        sz = (n_signals-1, n_signals ÷ 2, nlags)
+
+    else
+
+        sz = (n_signals, (n_signals - 1) ÷ 2, nlags)
+
+    end
+
+    correlograms = zeros(T, sz)
+
+    coeffs = zeros(T, sz[1:2])
+    lags   = zeros(T, sz[1:2])
+
+    A_gpu = memcopy(A, device)
+    c_GPU = memcopy(correlograms, device)
+    coeffs_GPU = memcopy(coeffs, device)
+    lags_GPU = memcopy(lags, device)
+
+    return A_gpu, c_GPU, coeffs_GPU, lags_GPU
+
 
 end
