@@ -144,7 +144,7 @@ function norm_correlogram(A::AbstractArray{T}, B::AbstractArray{T}, τ::Int, thr
 
 end
 
-function norm_correlogram(A::AbstractArray{T}, τ::Int, threads_per_block::Int; device) where T
+function norm_correlogram(A::AbstractArray{T}, τ::Int, threads_per_block::Int; device=0) where T
     assert_input(A)
 
     A_norm = normalize_columns(A)
