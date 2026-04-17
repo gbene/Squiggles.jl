@@ -152,7 +152,7 @@ function set_GPUbackend end
 
 Get the KA kernel for the sample length
 """
-function get_kernel(nsamples::Int)
+function get_kernel(nsamples::Integer)
 
     return kernels_dict[string(nsamples)]
 end

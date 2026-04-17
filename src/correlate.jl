@@ -12,7 +12,7 @@ Each signal in A is run across each signal in B with lags ∈ [-τ, τ]
 
 - `A::AbstractArray` -- n_samples x n_signals matrix
 - `B::AbstractArray` -- n_samples x m_signals matrix
-- `τ::Int` -- Lag length
+- `τ::Integer` -- Lag length
 - `threads_per_block` -- Number of threads per block
 
 ### Outputs
@@ -29,7 +29,7 @@ As of now only signals that have n samples as a power of 2 can be used. If this 
 
 
 """
-function correlogram(A::AbstractArray{T}, B::AbstractArray{T}, τ::Int, threads_per_block::Int; device=0) where T
+function correlogram(A::AbstractArray{T}, B::AbstractArray{T}, τ::Integer, threads_per_block::Integer; device::Integer=0) where T
     assert_input(A)
     assert_input(B)
 
@@ -62,7 +62,7 @@ function correlogram(A::AbstractArray{T}, B::AbstractArray{T}, τ::Int, threads_
 end
 
 
-function correlogram(A::AbstractArray{T}, τ::Int, threads_per_block::Int; device=0) where T
+function correlogram(A::AbstractArray{T}, τ::Integer, threads_per_block::Integer; device::Integer=0) where T
     assert_input(A)
 
     n_signals = size(A, 2)
@@ -116,7 +116,7 @@ Each signal in A is run across each signal in B with lags ∈ [-τ, τ]
 
 - `A::AbstractArray` -- n_samples x n_signals matrix
 - `B::AbstractArray` -- n_samples x m_signals matrix
-- `τ::Int` -- Lag length
+- `τ::Integer` -- Lag length
 - `threads_per_block` -- Number of threads per block
 
 ### Outputs
@@ -132,7 +132,7 @@ be of size N-1 x N/2 (for N even) or N X (N-1)/2 (for N odd).
 As of now only signals that have n samples as a power of 2 can be used. If this condition is not met an error is thrown
 
 """
-function norm_correlogram(A::AbstractArray{T}, B::AbstractArray{T}, τ::Int, threads_per_block::Int; device=0) where T
+function norm_correlogram(A::AbstractArray{T}, B::AbstractArray{T}, τ::Integer, threads_per_block::Integer; device::Integer=0) where T
     assert_input(A)
     assert_input(B)
 
@@ -144,7 +144,7 @@ function norm_correlogram(A::AbstractArray{T}, B::AbstractArray{T}, τ::Int, thr
 
 end
 
-function norm_correlogram(A::AbstractArray{T}, τ::Int, threads_per_block::Int; device=0) where T
+function norm_correlogram(A::AbstractArray{T}, τ::Integer, threads_per_block::Integer; device::Integer=0) where T
     assert_input(A)
 
     A_norm = normalize_columns(A)
@@ -165,8 +165,8 @@ maximum correlation value (preserving the original sign).
 ### Arguments
 
 - `correlograms::AbstractArray{T, 3}` -- Correlogram volume
-- `τ::Int` -- lag length
-- `sampling_rate::Int` -- Sampling rate
+- `τ::Integer` -- lag length
+- `sampling_rate::Integer` -- Sampling rate
 
 
 ### Outputs
@@ -185,7 +185,7 @@ If the sampling rate is provided then the lags will be in seconds
 - ```simplelags(correlograms, 128, 100)``` -- Lags will be in seconds
 
 """
-function simplelags(correlograms::AbstractArray{T, 3}, τ::Int) where T
+function simplelags(correlograms::AbstractArray{T, 3}, τ::Integer) where T
     idx = findmax(abs,correlograms, dims=3)[2] # get the index of the absolute maximums
     coeffs = correlograms[idx]
     lags = map(x -> x[3] .- τ, idx) # the lags are the index - the amount of lag used
@@ -193,7 +193,7 @@ function simplelags(correlograms::AbstractArray{T, 3}, τ::Int) where T
     return dropdims(coeffs, dims=3), dropdims(lags, dims=3)
 end
 
-function simplelags(correlograms::AbstractArray{T, 3}, τ::Int, sampling_rate::Int) where T
+function simplelags(correlograms::AbstractArray{T, 3}, τ::Integer, sampling_rate::Integer) where T
 
     coeffs, lags = simplelags(correlograms, τ)
 

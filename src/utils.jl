@@ -5,8 +5,8 @@ Get the i, j index of the lower triangle (excluding the diagonal) of a matrix of
 
 ### Arguments
 
-- `k::Int` -- The linear index
-- `n::Int` -- The size of the matrix (n x n)
+- `k::Integer` -- The linear index
+- `n::Integer` -- The size of the matrix (n x n)
 
 ### Notes
 https://atrebas.github.io/post/2021-01-17-index_to_lower_triangular_subscripts/
@@ -14,7 +14,7 @@ https://atrebas.github.io/post/2021-01-17-index_to_lower_triangular_subscripts/
 function linear2tr_nodiag(k::Integer, n::Integer)
 
     kp = n * (n - 1) ÷ 2 - k
-    p = floor(Int, ( sqrt(1 + 8 * kp) - 1 ) / 2 )
+    p = floor(Integer, ( sqrt(1 + 8 * kp) - 1 ) / 2 )
 
     i = n - (kp - p * (p + 1) ÷ 2)
     j = n - 1 - p
@@ -106,7 +106,7 @@ function reconstruct_nodiag(m::Matrix{T}) where T
 
     n_nodiag = length(m)
 
-    N = (1+Int(sqrt(1+8*n_nodiag)))÷2
+    N = (1+Integer(sqrt(1+8*n_nodiag)))÷2
     M = zeros(T, N,N)
 
     M[diagonal_indexes(M)] .= 1
@@ -143,7 +143,7 @@ end
 
 Calculate the memory required to perform A⋆B or A⋆A
 """
-function calculate_memory(A::AbstractArray{T}, B::AbstractArray{T}, τ::Int) where T
+function calculate_memory(A::AbstractArray{T}, B::AbstractArray{T}, τ::Integer) where T
 
     A_size = sizeof(A)
     B_size = sizeof(B)
@@ -154,7 +154,7 @@ function calculate_memory(A::AbstractArray{T}, B::AbstractArray{T}, τ::Int) whe
 
 end
 
-function calculate_memory(A::AbstractArray{T}, τ::Int) where T
+function calculate_memory(A::AbstractArray{T}, τ::Integer) where T
 
     A_size = sizeof(A)
 

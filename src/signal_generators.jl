@@ -58,7 +58,7 @@ function RandomEvent(freq_range, phase_range, intensity_range,
                     samp_freq, duration, n_iterations)
 
 
-    n_samples = Int(samp_freq*duration)
+    n_samples = Integer(samp_freq*duration)
 
     time = LinRange(0, duration, n_samples)
 
@@ -104,10 +104,10 @@ function AddPadding(signal, samp_freq, s_of_padding, s_of_delay)
     signal_time = n_samples/samp_freq
 
 
-    padding = Int(s_of_padding*samp_freq)
+    padding = Integer(s_of_padding*samp_freq)
     padded_signal = zeros(ComplexF64, n_samples+2*padding)
 
-    delay = Int(floor(s_of_delay*samp_freq))
+    delay = Integer(floor(s_of_delay*samp_freq))
     start_index = padding+delay
 
     end_index = start_index+n_samples
@@ -130,8 +130,8 @@ end
 
 function ExtractSnippet(signal, time, samp_freq, start_time_s, end_time_s)
 
-    start_time_samp = Int(round(start_time_s*samp_freq))
-    end_time_samp = Int(round(end_time_s*samp_freq))
+    start_time_samp = Integer(round(start_time_s*samp_freq))
+    end_time_samp = Integer(round(end_time_s*samp_freq))
 
 
     snippet = signal[start_time_samp:end_time_samp-1]
@@ -193,9 +193,9 @@ Create a matrix of random signals. The matrix will have size sampling_rate x n_s
 
 ### Arguments
 
-    -`sampling_rate::Int` -- Sampling rate of each signal
+    -`sampling_rate::Integer` -- Sampling rate of each signal
     -`duration::Number` -- Duration (in s) of each signal
-    -`n_signals::Int` -- Number of signals
+    -`n_signals::Integer` -- Number of signals
     -`freq_range::Range` -- Frequency range used to form the signal
     -`padding::Number` -- Amount of padding (in s) to add to the signals
     -`delay_range::Range` -- Delay to add to each signal
