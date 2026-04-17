@@ -62,7 +62,7 @@ function plotCorrelogram(correlograms)
 
     perm_corrs = permutedims(correlograms,(3,1,2))
     n_signals, n_templates, n_lags = size(correlograms)
-    corr_length = (n_lags-1)/2
+    τ = (n_lags-1)/2
     fig = Figure(size=(900,900))
     ax = Axis3(fig[1, 1], xlabel="Lags", ylabel="i", zlabel="j")
 
@@ -72,11 +72,11 @@ function plotCorrelogram(correlograms)
     ylims!(ax2, -1, 1)
 
     points = lift(sl_y.value, sl_z.value) do y, z
-        [Point3f(-corr_length*1.1, y+0.5, z+0.5), Point3f(corr_length*1.1, y+0.5, z+0.5)]
+        [Point3f(-τ*1.1, y+0.5, z+0.5), Point3f(τ*1.1, y+0.5, z+0.5)]
     end
 
     text_pos = lift(sl_y.value, sl_z.value) do y, z
-        Point3f(-corr_length*1.1, y+0.5, z+0.5)
+        Point3f(-τ*1.1, y+0.5, z+0.5)
     end
 
     text_label = lift(sl_y.value, sl_z.value) do y, z
@@ -92,7 +92,7 @@ function plotCorrelogram(correlograms)
     lines!(ax2,correlogram)
 
 
-    volume!(ax, (-corr_length,corr_length), (1,n_signals),(1,n_templates), perm_corrs, interpolate = false)
+    volume!(ax, (-τ,τ), (1,n_signals),(1,n_templates), perm_corrs, interpolate = false)
 
     display(fig)
 

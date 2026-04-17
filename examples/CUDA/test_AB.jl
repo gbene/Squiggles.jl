@@ -18,6 +18,7 @@ threads_per_block = 128
 
 correlograms_gpu = correlogram(A, B, τ, threads_per_block)
 correlograms_norm_gpu = norm_correlogram(A, B, τ, threads_per_block)
+coeffs_gpu, lags = simplelags(correlograms_norm_gpu, τ)
 
 
 correlograms = memcopy(correlograms_gpu)
@@ -26,9 +27,6 @@ correlograms_norm = memcopy(correlograms_norm_gpu)
 
 corr_fig, corr_ax = plotCorrelogram(correlograms)
 corrn_fig, corrn_ax = plotCorrelogram(correlograms_norm)
-
-coeffs_gpu, lags = simplelags(correlograms_norm_gpu, τ)
-
 coeffs = memcopy(coeffs_gpu)
 
-coeff_fig, coeff_ax = plotCC(coeffs[:,:])
+coeff_fig, coeff_ax = plotCC(coeffs)
