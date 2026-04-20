@@ -9,7 +9,7 @@ Calculate correlograms for templates and signals that have 16 samples
 
 - `templates::AbstractArray` -- Array of templates. This must be an array of 16 x ntemplates (rows x cols)
 - `signals::AbstractArray` -- Array of signals. This must be an array of 16 x nsignals (rows x cols)
-- `τ::Int` -- Length of samples to be correlated [-τ; τ].
+- `τ::Integer` -- Length of samples to be correlated [-τ; τ].
 - `correlograms::AbstractArray` -- Output array of correlograms. This must be of size ntemplates x nsignals x τ*2+1
 
 ### Output
@@ -24,7 +24,7 @@ This functions works inplace and will overwrite data in the `correlograms` matri
 """
 @kernel function correlogram_ak16(templates::AbstractArray{T},
                                    signals::AbstractArray{T},
-                                   τ::Int,
+                                   τ::Integer,
                                    correlograms::AbstractArray{T},
                                    ) where T
 
@@ -37,7 +37,7 @@ This functions works inplace and will overwrite data in the `correlograms` matri
 end
 
 @kernel function correlogram_ak16(templates::AbstractArray{T},
-                                   τ::Int,
+                                   τ::Integer,
                                    correlograms::AbstractArray{T},
                                    ) where T
 
@@ -59,7 +59,7 @@ Calculate correlograms for templates and signals that have 32 samples
 
 - `templates::AbstractArray` -- Array of templates. This must be an array of 32 x ntemplates (rows x cols)
 - `signals::AbstractArray` -- Array of signals. This must be an array of 32 x nsignals (rows x cols)
-- `τ::Int` -- Length of samples to be correlated [-τ; τ].
+- `τ::Integer` -- Length of samples to be correlated [-τ; τ].
 - `correlograms::AbstractArray` -- Output array of correlograms. This must be of size ntemplates x nsignals x τ*2+1
 
 ### Output
@@ -74,7 +74,7 @@ This functions works inplace and will overwrite data in the `correlograms` matri
 """
 @kernel function correlogram_ak32(templates::AbstractArray{T},
                                    signals::AbstractArray{T},
-                                   τ::Int,
+                                   τ::Integer,
                                    correlograms::AbstractArray{T},
                                    ) where T
 
@@ -87,7 +87,7 @@ This functions works inplace and will overwrite data in the `correlograms` matri
 end
 
 @kernel function correlogram_ak32(templates::AbstractArray{T},
-                                   τ::Int,
+                                   τ::Integer,
                                    correlograms::AbstractArray{T},
                                    ) where T
 
@@ -109,7 +109,7 @@ Calculate correlograms for templates and signals that have 64 samples
 
 - `templates::AbstractArray` -- Array of templates. This must be an array of 64 x ntemplates (rows x cols)
 - `signals::AbstractArray` -- Array of signals. This must be an array of 64 x nsignals (rows x cols)
-- `τ::Int` -- Length of samples to be correlated [-τ; τ].
+- `τ::Integer` -- Length of samples to be correlated [-τ; τ].
 - `correlograms::AbstractArray` -- Output array of correlograms. This must be of size ntemplates x nsignals x τ*2+1
 
 ### Output
@@ -124,7 +124,7 @@ This functions works inplace and will overwrite data in the `correlograms` matri
 """
 @kernel function correlogram_ak64(templates::AbstractArray{T},
                                    signals::AbstractArray{T},
-                                   τ::Int,
+                                   τ::Integer,
                                    correlograms::AbstractArray{T},
                                    ) where T
 
@@ -137,7 +137,7 @@ This functions works inplace and will overwrite data in the `correlograms` matri
 end
 
 @kernel function correlogram_ak64(templates::AbstractArray{T},
-                                   τ::Int,
+                                   τ::Integer,
                                    correlograms::AbstractArray{T},
                                    ) where T
 
@@ -162,7 +162,7 @@ Calculate correlograms for templates and signals that have 128 samples
 
 - `templates::AbstractArray` -- Array of templates. This must be an array of 128 x ntemplates (rows x cols)
 - `signals::AbstractArray` -- Array of signals. This must be an array of 128 x nsignals (rows x cols)
-- `τ::Int` -- Length of samples to be correlated [-τ; τ].
+- `τ::Integer` -- Length of samples to be correlated [-τ; τ].
 - `correlograms::AbstractArray` -- Output array of correlograms. This must be of size ntemplates x nsignals x τ*2+1
 
 ### Output
@@ -177,7 +177,7 @@ This functions works inplace and will overwrite data in the `correlograms` matri
 """
 @kernel function correlogram_ak128(templates::AbstractArray{T},
                                    signals::AbstractArray{T},
-                                   τ::Int,
+                                   τ::Integer,
                                    correlograms::AbstractArray{T},
                                    ) where T
 
@@ -189,7 +189,7 @@ This functions works inplace and will overwrite data in the `correlograms` matri
 end
 
 @kernel function correlogram_ak128(templates::AbstractArray{T},
-                                   τ::Int,
+                                   τ::Integer,
                                    correlograms::AbstractArray{T},
                                    ) where T
 
@@ -211,7 +211,7 @@ Calculate correlograms for templates and signals that have 256 samples
 
 - `templates::AbstractArray` -- Array of templates. This must be an array of 256 x ntemplates (rows x cols)
 - `signals::AbstractArray` -- Array of signals. This must be an array of 256 x nsignals (rows x cols)
-- `τ::Int` -- Length of samples to be correlated [-τ; τ].
+- `τ::Integer` -- Length of samples to be correlated [-τ; τ].
 - `correlograms::AbstractArray` -- Output array of correlograms. This must be of size ntemplates x nsignals x τ*2+1
 
 ### Output
@@ -226,7 +226,7 @@ This functions works inplace and will overwrite data in the `correlograms` matri
 """
 @kernel function correlogram_ak256(templates::AbstractArray{T},
                                    signals::AbstractArray{T},
-                                   τ::Int,
+                                   τ::Integer,
                                    correlograms::AbstractArray{T},
                                    ) where T
 
@@ -238,7 +238,7 @@ This functions works inplace and will overwrite data in the `correlograms` matri
 end
 
 @kernel function correlogram_ak256(templates::AbstractArray{T},
-                                   τ::Int,
+                                   τ::Integer,
                                    correlograms::AbstractArray{T},
                                    ) where T
 
@@ -260,7 +260,7 @@ Calculate correlograms for templates and signals that have 512 samples
 
 - `templates::AbstractArray` -- Array of templates. This must be an array of 512 x ntemplates (rows x cols)
 - `signals::AbstractArray` -- Array of signals. This must be an array of 512 x nsignals (rows x cols)
-- `τ::Int` -- Length of samples to be correlated [-τ; τ].
+- `τ::Integer` -- Length of samples to be correlated [-τ; τ].
 - `correlograms::AbstractArray` -- Output array of correlograms. This must be of size ntemplates x nsignals x τ*2+1
 
 ### Output
@@ -275,7 +275,7 @@ This functions works inplace and will overwrite data in the `correlograms` matri
 """
 @kernel function correlogram_ak512(templates::AbstractArray{T},
                                    signals::AbstractArray{T},
-                                   τ::Int,
+                                   τ::Integer,
                                    correlograms::AbstractArray{T},
                                    ) where T
 
@@ -287,7 +287,7 @@ This functions works inplace and will overwrite data in the `correlograms` matri
 end
 
 @kernel function correlogram_ak512(templates::AbstractArray{T},
-                                   τ::Int,
+                                   τ::Integer,
                                    correlograms::AbstractArray{T},
                                    ) where T
 
@@ -309,7 +309,7 @@ Calculate correlograms for templates and signals that have 1024 samples
 
 - `templates::AbstractArray` -- Array of templates. This must be an array of 1024 x ntemplates (rows x cols)
 - `signals::AbstractArray` -- Array of signals. This must be an array of 1024 x nsignals (rows x cols)
-- `τ::Int` -- Length of samples to be correlated [-τ; τ].
+- `τ::Integer` -- Length of samples to be correlated [-τ; τ].
 - `correlograms::AbstractArray` -- Output array of correlograms. This must be of size ntemplates x nsignals x τ*2+1
 
 ### Output
@@ -324,7 +324,7 @@ This functions works inplace and will overwrite data in the `correlograms` matri
 """
 @kernel function correlogram_ak1024(templates::AbstractArray{T},
                                    signals::AbstractArray{T},
-                                   τ::Int,
+                                   τ::Integer,
                                    correlograms::AbstractArray{T},
                                    ) where T
 
@@ -336,7 +336,7 @@ This functions works inplace and will overwrite data in the `correlograms` matri
 end
 
 @kernel function correlogram_ak1024(templates::AbstractArray{T},
-                                   τ::Int,
+                                   τ::Integer,
                                    correlograms::AbstractArray{T},
                                    ) where T
 

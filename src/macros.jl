@@ -9,7 +9,7 @@ end
 
 @def kernel_template begin
 
-    n_lags = corr_length*2 +1
+    n_lags = τ*2 +1
 
     size_template = size(templates, 1)
     size_signal = size(signals, 1)
@@ -53,7 +53,7 @@ end
 
     # @unroll
     @unroll for i = thread_index:stride:n_lags
-        lag = (i-1)-corr_length
+        lag = (i-1)-τ
         # @print("$lag")
         # @inbounds lag_cache[i] = lag
         @inbounds correlograms[template_block_index, signal_block_index,i] = lagged_dot(template, signal, size_template, size_signal, lag)
@@ -62,7 +62,7 @@ end
 
 @def optimized_kernel_template begin
 
-    n_lags = corr_length*2 +1
+    n_lags = τ*2 +1
 
     size_template = size_signal = size(templates, 1)
     N = size(templates, 2)
@@ -112,7 +112,7 @@ end
 
     # @unroll
     @unroll for i = thread_index:stride:n_lags
-        lag = (i-1)-corr_length
+        lag = (i-1)-τ
         # @print("$lag")
         # @inbounds lag_cache[i] = lag
         @inbounds correlograms[n, m, i] = lagged_dot(template, signal, size_template, size_template, lag)

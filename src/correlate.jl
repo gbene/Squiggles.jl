@@ -12,7 +12,7 @@ Each signal in A is run across each signal in B with lags ∈ [-τ, τ]
 
 - `A::AbstractArray` -- n_samples x n_signals matrix
 - `B::AbstractArray` -- n_samples x m_signals matrix
-- `τ::Int` -- Lag length
+- `τ::Integer` -- Lag length
 - `threads_per_block` -- Number of threads per block
 
 ### Outputs
@@ -29,7 +29,7 @@ As of now only signals that have n samples as a power of 2 can be used. If this 
 
 
 """
-function correlogram(A::AbstractArray{T}, B::AbstractArray{T}, τ::Int, threads_per_block::Int) where T
+function correlogram(A::AbstractArray{T}, B::AbstractArray{T}, τ::Integer, threads_per_block::Integer; device::Integer=0) where T
     assert_input(A)
     assert_input(B)
 
@@ -49,9 +49,9 @@ function correlogram(A::AbstractArray{T}, B::AbstractArray{T}, τ::Int, threads_
     ndrange = nthreads .* blocks # Total number of threads that need to be launched i.e. nthreads*blocks
 
 
-    A_gpu = memcopy(A)
-    B_gpu = memcopy(B)
-    correlograms_gpu = memcopy(correlograms)
+    A_gpu = memcopy(A, device)
+    B_gpu = memcopy(B, device)
+    correlograms_gpu = memcopy(correlograms, device)
 
     kernel = get_kernel(n_samples)(get_backend(A_gpu))
 
@@ -62,7 +62,11 @@ function correlogram(A::AbstractArray{T}, B::AbstractArray{T}, τ::Int, threads_
 end
 
 
-function correlogram(A::AbstractArray{T}, τ::Int, threads_per_block::Int) where T
+
+
+
+
+function correlogram(A::AbstractArray{T}, τ::Integer, threads_per_block::Integer; device::Integer=0) where T
     assert_input(A)
 
     n_signals = size(A, 2)
@@ -90,8 +94,8 @@ function correlogram(A::AbstractArray{T}, τ::Int, threads_per_block::Int) where
 
     ndrange = nthreads .* blocks # Total number of threads that need to be launched i.e. nthreads*blocks
 
-    A_gpu = memcopy(A)
-    correlograms_gpu = memcopy(correlograms)
+    A_gpu = memcopy(A, device)
+    correlograms_gpu = memcopy(correlograms, device)
 
 
     kernel = get_kernel(n_samples)(get_backend(A_gpu))
@@ -102,6 +106,50 @@ function correlogram(A::AbstractArray{T}, τ::Int, threads_per_block::Int) where
 
 end
 
+
+"""
+    correlogram!(correlograms, A, B, τ, threads_per_block)
+    correlogram!(correlograms, A, τ, threads_per_block)
+
+Inplace version of the [`correlogram`](@ref) function.
+
+### Notes
+
+This assumes that the inputs are already moved to the device, use [`prepare_inputs`](@ref)
+"""
+function correlogram!(correlograms::AbstractArray{T, 3}, A::AbstractArray{T}, B::AbstractArray{T}, τ::Integer, threads_per_block::Integer) where T
+    assert_input(A)
+    assert_input(B)
+
+
+    n_samples = size(A, 1)
+
+    nthreads = (threads_per_block, 1)
+    blocks = size(correlograms)[1:2]
+
+    ndrange = nthreads .* blocks # Total number of threads that need to be launched i.e. nthreads*blocks
+
+    kernel = get_kernel(n_samples)(get_backend(A))
+
+    kernel(A, B, τ, correlograms, ndrange=ndrange, workgroupsize=nthreads)
+
+end
+
+function correlogram!(correlograms::AbstractArray{T, 3}, A::AbstractArray{T}, τ::Integer, threads_per_block::Integer) where T
+    assert_input(A)
+
+    n_samples = size(A, 1)
+
+    nthreads = (threads_per_block, 1)
+    blocks = size(correlograms)[1:2]
+
+    ndrange = nthreads .* blocks # Total number of threads that need to be launched i.e. nthreads*blocks
+
+    kernel = get_kernel(n_samples)(get_backend(A))
+
+    kernel(A, τ, correlograms, ndrange=ndrange, workgroupsize=nthreads)
+
+end
 
 """
     norm_correlogram(A, B, τ, threads_per_block)
@@ -116,7 +164,7 @@ Each signal in A is run across each signal in B with lags ∈ [-τ, τ]
 
 - `A::AbstractArray` -- n_samples x n_signals matrix
 - `B::AbstractArray` -- n_samples x m_signals matrix
-- `τ::Int` -- Lag length
+- `τ::Integer` -- Lag length
 - `threads_per_block` -- Number of threads per block
 
 ### Outputs
@@ -132,24 +180,56 @@ be of size N-1 x N/2 (for N even) or N X (N-1)/2 (for N odd).
 As of now only signals that have n samples as a power of 2 can be used. If this condition is not met an error is thrown
 
 """
-function norm_correlogram(A::AbstractArray{T}, B::AbstractArray{T}, τ::Int, threads_per_block::Int) where T
+function norm_correlogram(A::AbstractArray{T}, B::AbstractArray{T}, τ::Integer, threads_per_block::Integer; device::Integer=0) where T
     assert_input(A)
     assert_input(B)
 
     A_norm = normalize_columns(A)
     B_norm = normalize_columns(B)
 
-    return correlogram(A_norm, B_norm, τ, threads_per_block)
+    return correlogram(A_norm, B_norm, τ, threads_per_block, device=device)
 
 
 end
 
-function norm_correlogram(A::AbstractArray{T}, τ::Int, threads_per_block::Int) where T
+function norm_correlogram(A::AbstractArray{T}, τ::Integer, threads_per_block::Integer; device::Integer=0) where T
     assert_input(A)
 
     A_norm = normalize_columns(A)
 
-    return correlogram(A_norm, τ, threads_per_block)
+    return correlogram(A_norm, τ, threads_per_block, device=device)
+
+
+end
+
+
+"""
+    norm_correlogram!(correlograms, A, B, τ, threads_per_block)
+    norm_correlogram!(correlograms, A, τ, threads_per_block)
+
+Inplace version of the [`norm_correlogram`](@ref) function.
+
+### Notes
+
+This assumes that the inputs are already moved to the device, use [`prepare_inputs`](@ref)
+"""
+function norm_correlogram!(correlograms::AbstractArray{T, 3}, A::AbstractArray{T}, B::AbstractArray{T}, τ::Integer, threads_per_block::Integer) where T
+    assert_input(A)
+    assert_input(B)
+
+    A_norm = normalize_columns(A)
+    B_norm = normalize_columns(B)
+
+    correlogram!(correlograms, A_norm, B_norm, τ, threads_per_block)
+
+end
+
+function norm_correlogram!(correlograms::AbstractArray{T, 3}, A::AbstractArray{T}, τ::Integer, threads_per_block::Integer) where T
+    assert_input(A)
+
+    A_norm = normalize_columns(A)
+
+    correlogram!(correlograms, A_norm, τ, threads_per_block)
 
 
 end
@@ -165,8 +245,8 @@ maximum correlation value (preserving the original sign).
 ### Arguments
 
 - `correlograms::AbstractArray{T, 3}` -- Correlogram volume
-- `τ::Int` -- lag length
-- `sampling_rate::Int` -- Sampling rate
+- `τ::Integer` -- lag length
+- `sampling_rate::Integer` -- Sampling rate
 
 
 ### Outputs
@@ -185,17 +265,42 @@ If the sampling rate is provided then the lags will be in seconds
 - ```simplelags(correlograms, 128, 100)``` -- Lags will be in seconds
 
 """
-function simplelags(correlograms::AbstractArray{T, 3}, τ::Int) where T
-    idx = findmax(abs,correlograms, dims=3)[2] # get the index of the absolute maximums
+function simplelags(correlograms::AbstractArray{T, 3}, τ::Integer) where T
+    idx = findmax(abs, correlograms, dims=3)[2] # get the index of the absolute maximums
     coeffs = correlograms[idx]
     lags = map(x -> x[3] .- τ, idx) # the lags are the index - the amount of lag used
 
     return dropdims(coeffs, dims=3), dropdims(lags, dims=3)
 end
 
-function simplelags(correlograms::AbstractArray{T, 3}, τ::Int, sampling_rate::Int) where T
+function simplelags(correlograms::AbstractArray{T, 3}, τ::Integer, sampling_rate::Integer) where T
 
     coeffs, lags = simplelags(correlograms, τ)
 
     return coeffs, lags./sampling_rate
+end
+
+
+"""
+    simplelags!(coeffs, lags, correlograms, τ)
+    simplelags!(coeffs, lags, correlograms, τ, sampling_rate)
+
+Inplace version of the [`simplelags`](@ref) function.
+
+### Notes
+
+This assumes that the inputs are already moved to the device, use [`prepare_inputs`](@ref)
+"""
+function simplelags!(coeffs::AbstractArray{T}, lags::AbstractArray{T}, correlograms::AbstractArray{T, 3}, τ::Integer) where T
+    idx = findmax(abs, correlograms, dims=3)[2] # get the index of the absolute maximums
+    coeffs .= correlograms[idx]
+    map!(x -> x[3] .- τ, lags, idx) # the lags are the index - the amount of lag used
+
+end
+
+function simplelags!(coeffs::AbstractArray{T}, lags::AbstractArray{T}, correlograms::AbstractArray{T, 3}, τ::Integer, sampling_rate::Integer) where T
+
+    simplelags!(coeffs, lags, correlograms, τ)
+
+    lags ./= sampling_rate
 end

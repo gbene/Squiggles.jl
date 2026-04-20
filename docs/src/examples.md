@@ -123,3 +123,70 @@ coeff_fig, coeff_ax = plotCC(coeffs)
 
 display(corrn_fig)
 ```
+
+## 4. Using muliple GPUs
+
+Squiggles has the possibility of running the [correlogram](@ref) and [norm_correlogram](@ref) functions on multiple GPUs. This is useful for example when it is necessary to chunk a big input or process muliple inputs at once. This is still an experimental feature.
+
+
+```julia
+
+using Squiggles
+using CUDA
+using Dates
+
+
+
+set_GPUbackend()
+
+i = 5000
+j = 5000
+n_samples = 128
+τ = 128
+threads_per_block = 64
+
+A = SignalMatrix(n_samples, 1, i, 1:20, 1, -0.5:0.1:0.5)
+B = SignalMatrix(n_samples, 1, j, 1:20, 1, -0.5:0.1:0.5)
+C = SignalMatrix(n_samples, 1, i, 1:20, 1, -0.5:0.1:0.5)
+D = SignalMatrix(n_samples, 1, j, 1:20, 1, -0.5:0.1:0.5)
+
+a_gpu, b_gpu, corrab_gpu, coeffab_gpu, lagsab_gpu = prepare_inputs(A, B, τ)
+c_gpu, d_gpu, corrcd_gpu, coeffcd_gpu, lagscd_gpu = prepare_inputs(C, D, τ, device=1)
+
+
+
+
+start = now()
+@sync begin
+    @async begin
+        device!(0)
+        norm_correlogram!(corrab_gpu, a_gpu, b_gpu, τ, threads_per_block)
+
+    end
+    @async begin
+        device!(1)
+        norm_correlogram!(corrcd_gpu, c_gpu, d_gpu, τ, threads_per_block)
+    end
+end
+#
+
+
+display("$(now()-start)")
+
+corrab = memcopy(corrab_gpu)
+corrcd = memcopy(corrcd_gpu)
+
+
+
+a_gpu, b_gpu, corrab_gpu, coeffab_gpu, lagsab_gpu = nothing, nothing, nothing, nothing, nothing
+c_gpu, d_gpu, corrcd_gpu, coeffcd_gpu, lagscd_gpu = nothing, nothing, nothing, nothing, nothing
+
+device!(0)
+GC.gc()
+CUDA.reclaim()
+
+device!(1)
+GC.gc()
+CUDA.reclaim()
+
+```

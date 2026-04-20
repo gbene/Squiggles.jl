@@ -3,16 +3,16 @@ Group all functions that can also be used in kernels (i.e. __device__ functions)
 """
 
 """
-    lagged_dot(template::AbstractVector{T}, signal::AbstractVector{T}, size_template::Int, size_signal::Int, lag::Int)
+    lagged_dot(template::AbstractVector{T}, signal::AbstractVector{T}, size_template::Integer, size_signal::Integer, lag::Integer)
 
 Calculate the dot product between the template and a lagged signal.
 """
 function lagged_dot(
     template::AbstractVector{T},
     signal::AbstractVector{T},
-    size_template::Int,
-    size_signal::Int,
-    lag::Int) where T
+    size_template::Integer,
+    size_signal::Integer,
+    lag::Integer) where T
 
     dot_prod = T(0)
 

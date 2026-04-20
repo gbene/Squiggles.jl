@@ -34,6 +34,6 @@ export used_backend, get_available_platforms, get_available_GPUplatforms, set_CP
 export cc, ncc
 export RandomEvent, AddPadding, AddNoise, ExtractSnippet, SignalMatrix
 export plotSignalMatrix, plotCorrelogram, plotCC
-export normalize_columns, reduce_M_nodiag, calculate_memory, linear2tr_nodiag, reconstruct_nodiag
-export correlogram, norm_correlogram, simplelags
+export normalize_columns, reduce_M_nodiag, calculate_memory, linear2tr_nodiag, reconstruct_nodiag, prepare_inputs
+export correlogram, norm_correlogram, simplelags, correlogram!, norm_correlogram!, simplelags!
 end # module Squiggles

@@ -1,10 +1,10 @@
 name = "Squiggles"
 uuid = "d934da09-a6a1-40ff-a16a-ac00174578b4"
-version = "0.2.0"
+version = "0.3.0"
 authors = ["gbene <gabri.benedetti@gmail.com>", "Ylse Anna de Vries <yad2@hi.is>"]
 
 [workspace]
-projects = ["docs", "tests/kernelabstractions", "tests/Plots", "tests/tr_index", "test/macros", "examples/CUDA"]
+projects = ["docs", "tests/kernelabstractions", "tests/Plots", "tests/tr_index", "test/macros", "examples/CUDA", "benchmarks"]
 
 [deps]
 GPUArrays = "0c68f7d7-f131-5f86-a1c3-88cf8149b2d7"

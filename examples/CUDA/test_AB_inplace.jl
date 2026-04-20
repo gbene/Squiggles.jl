@@ -14,18 +14,17 @@ B = SignalMatrix(n_samples, 1, m_B, 1:20, 1, -0.5:0.1:0.5)
 
 τ = 128
 
+
+A_gpu, B_gpu, correlograms_norm_gpu, coeffs_gpu, lags_gpu = prepare_inputs(A, B, τ)
+
+
 threads_per_block = 128
 
-correlograms_gpu = correlogram(A, B, τ, threads_per_block)
-correlograms_norm_gpu = norm_correlogram(A, B, τ, threads_per_block)
-coeffs_gpu, lags = simplelags(correlograms_norm_gpu, τ)
+norm_correlogram!(correlograms_norm_gpu, A_gpu, A_gpu, τ, threads_per_block)
+simplelags!(coeffs_gpu, lags_gpu, correlograms_norm_gpu, τ)
 
-
-correlograms = memcopy(correlograms_gpu)
 correlograms_norm = memcopy(correlograms_norm_gpu)
 
-
-corr_fig, corr_ax = plotCorrelogram(correlograms)
 corrn_fig, corrn_ax = plotCorrelogram(correlograms_norm)
 coeffs = memcopy(coeffs_gpu)
 
