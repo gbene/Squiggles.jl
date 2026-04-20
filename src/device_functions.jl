@@ -31,6 +31,36 @@ function lagged_dot(
     return dot_prod
 end
 
+# function lagged_dot(
+#     template::AbstractVector{T},
+#     signal::AbstractVector{T},
+#     size_template::Integer,
+#     size_signal::Integer,
+#     lag::Integer) where T
+
+#     dot_prod = T(0)
+
+#     if lag > 0
+
+#         for j = 1:size_template-lag
+#             signal_index = lag+j
+#             @inbounds s = signal[signal_index]
+#             @inbounds t = template[j]
+#             dot_prod += s*t
+
+#         end
+#     else
+#         for j = abs(lag)+1:size_template
+#             signal_index = lag+j
+#             @inbounds s = signal[signal_index]
+#             @inbounds t = template[j]
+#             dot_prod += s*t
+#         end
+#     end
+
+
+#     return dot_prod
+# end
 
 
 
