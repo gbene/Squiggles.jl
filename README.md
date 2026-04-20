@@ -55,6 +55,8 @@ correlograms_norm_gpu = norm_correlogram(A, B, τ, threads_per_block) # Normaliz
 norm_coeffs_gpu, lags_gpu = simplelags(correlograms_norm_gpu, τ) # Correlation coeffs and lags matrices
 ```
 
+Check the [docs](https://gabri.xyz/Squiggles.jl/dev/examples/) for more examples!
+
 ## Acknowledgments
 
 
