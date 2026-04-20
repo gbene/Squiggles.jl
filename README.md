@@ -22,6 +22,10 @@ To use GPU acceleration you need to install the appropriate JuliaGPU package
 + ```] add Metal```     -- Apple silicon
 + More to come!
 
+To plot use either CairoMakie or GLMakie (for interactive plots)
+
++ ```] add CairoMakie```
++ ```] add GLMakie```
 
 
 ## Quick example
