@@ -7,6 +7,7 @@ using Squiggles
 using CUDA
 using JLD2
 using Dates
+using MAT
 
 set_GPUbackend()
 
@@ -26,6 +27,12 @@ data = load("data/1024.jld2")["out_vec"]
 
 mat = SignalMatrix(128, 1, 3500, 1:20, 1, -0.5:0.1:0.5) #data[4]
 τ = 128
+
+
+
+# file = matopen("data/5000.mat", "w")
+# write(file, "mat", mat)
+# close(file)
 
 # A, B, correlograms, coeffs, lags = prepare_inputs(mat, mat, τ)
 A, correlograms, coeffs, lags = prepare_inputs(mat, τ)
