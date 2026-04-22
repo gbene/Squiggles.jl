@@ -1,4 +1,23 @@
 """
+    diagonal_indexes(M)
+
+Get the diagonal linear indexes of a NxN matrix
+"""
+function diagonal_indexes(M::Matrix{T}) where {T}
+
+    N = size(M)[1]
+
+    indexes = zeros(T, N)
+
+    for k in 0:N-1
+        indexes[k+1] = 1+k*(N+1)
+    end
+
+    return indexes
+end
+
+
+"""
     linear2tr_nodiag(k, n)
 
 Get the i, j index of the lower triangle (excluding the diagonal) of a matrix of size n x n from a linear index k. Matrix is col-wise ordered
