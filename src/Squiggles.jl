@@ -2,7 +2,6 @@ module Squiggles
 
 using GPUArrays
 using StyledStrings
-using Makie
 using LinearAlgebra
 using KernelAbstractions
 import KernelAbstractions.Extras.@unroll
@@ -14,7 +13,7 @@ include("device_functions.jl")
 include("backends.jl")
 include("signal_generators.jl")
 include("kernels.jl")
-include("plotters.jl")
+# include("plotters.jl")
 include("correlate.jl")
 
 
@@ -33,7 +32,7 @@ const kernels_dict = Dict{String, Any}(["16" => correlogram_ak16,
 export used_backend, get_available_platforms, get_available_GPUplatforms, set_CPUbackend, set_GPUbackend, memcopy, get_kernel
 export cc, ncc
 export RandomEvent, AddPadding, AddNoise, ExtractSnippet, SignalMatrix
-export plotSignalMatrix, plotCorrelogram, plotCC
+# export plotSignalMatrix, plotCorrelogram, plotCC
 export normalize_columns, reduce_M_nodiag, calculate_memory, linear2tr_nodiag, reconstruct_symmetric, reconstruct_antisymmetric, prepare_inputs
 export correlogram, norm_correlogram, simplelags, correlogram!, norm_correlogram!, simplelags!
 end # module Squiggles

@@ -34,13 +34,6 @@ coeffs_gpu, lags = simplelags(correlograms_norm_gpu, τ) # Correlation coeffs an
 correlograms = memcopy(correlograms_gpu) # Copy from GPU to CPU
 correlograms_norm = memcopy(correlograms_norm_gpu)
 coeffs = memcopy(coeffs_gpu)
-
-
-corr_fig, corr_ax = plotCorrelogram(correlograms)
-corrn_fig, corrn_ax = plotCorrelogram(correlograms_norm)
-coeff_fig, coeff_ax = plotCC(coeffs)
-
-display(corrn_fig)
 ```
 
 
@@ -78,13 +71,6 @@ lags = memcopy(lags_gpu)
 
 coeffs_symm = reconstruct_nodiag(coeffs)
 lags_symm = reconstruct_nodiag(lags)
-
-corr_fig, corr_ax = plotCorrelogram(correlograms)
-corrn_fig, corrn_ax = plotCorrelogram(correlograms_norm)
-coeff_fig, coeff_ax = plotCC(coeffs)
-coeff_symm_fig, coeff_symm_ax = plotCC(coeffs_symm)
-
-display(corrn_fig)
 ```
 
 
@@ -127,13 +113,6 @@ lags = memcopy(lags_gpu)
 
 coeffs_symm = reconstruct_nodiag(coeffs)
 lags_symm = reconstruct_nodiag(lags)
-
-corr_fig, corr_ax = plotCorrelogram(correlograms)
-corrn_fig, corrn_ax = plotCorrelogram(correlograms_norm)
-coeff_fig, coeff_ax = plotCC(coeffs)
-coeff_symm_fig, coeff_symm_ax = plotCC(coeffs_symm)
-
-display(corrn_fig)
 ```
 
 ## 4. Using multiple GPUs

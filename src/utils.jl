@@ -107,7 +107,7 @@ end
 
 
 """
-    reconstruct_symmetric(M; diagonal_values=1)
+    reconstruct_symmetric(M; diagonal_values=1, fillwithnans::Bool=true)
 
 Given a reduced matrix **m** of size N-1 x N/2 (for N even) or N X (N-1)/2 (for N odd), get a symmetrical matrix **M** of size N x N.
 
@@ -116,17 +116,18 @@ Given a reduced matrix **m** of size N-1 x N/2 (for N even) or N X (N-1)/2 (for 
 
 - `m::Matrix` -- Reduced matrix of N-1 x N/2 (for N even) or N X (N-1)/2 (for N odd).
 - `diagonal_values` -- Number used to fill the diagonal. Default is 1
+- `fillwithnans::Bool` -- If true (default), fill the upper triangle with NaNs.
 
 ### Output
 
-- `M::Matrix` -- Input matrix of NxN
+- `M::Matrix{T}` -- Matrix of NxN of the type T of the input.
 
 ### Notes
 
 This function is mainly used after cross-correlation (A⋆A) to reconstruct a square matrix representation of the **cross correlation coefficients** in a lower triangular matrix form.
 Because of this, the default value for filling the diagonal is 1.
 """
-function reconstruct_symmetric(m::Matrix{T}; diagonal_values=1) where T
+function reconstruct_symmetric(m::Matrix{T}; diagonal_values=1, fillwithnans=true) where T
 
     n_nodiag = length(m)
 
@@ -140,7 +141,11 @@ function reconstruct_symmetric(m::Matrix{T}; diagonal_values=1) where T
         j = linear2tr_nodiag(c, N)[2]
 
         M[i,j] = m[c]
-        M[j,i] = m[c]
+        if fillwithnans
+            M[j,i] = NaN
+        else
+            M[j,i] = m[c]
+        end
     end
 
 
@@ -148,7 +153,7 @@ function reconstruct_symmetric(m::Matrix{T}; diagonal_values=1) where T
 end
 
 """
-    reconstruct_antisymmetric(M; diagonal_values=0)
+    reconstruct_antisymmetric(M; diagonal_values=0, fillwithnans::Bool=true)
 
 Given a reduced matrix **m** of size N-1 x N/2 (for N even) or N X (N-1)/2 (for N odd), get a anti-symmetrical matrix **M** of size N x N.
 
@@ -157,11 +162,12 @@ Given a reduced matrix **m** of size N-1 x N/2 (for N even) or N X (N-1)/2 (for 
 
 - `m::Matrix` -- Reduced matrix of N-1 x N/2 (for N even) or N X (N-1)/2 (for N odd).
 - `diagonal_values` -- Number used to fill the diagonal. Default is 0
+- `fillwithnans::Bool` -- If true (default), fill the upper triangle with NaNs.
 
 
 ### Output
 
-- `M::Matrix` -- Input matrix of NxN
+- `M::Matrix{Float64}` -- Matrix of NxN
 
 ### Notes
 
@@ -169,12 +175,12 @@ This function is mainly used after cross-correlation (A⋆A) to reconstruct a sq
 Because of this, the default value for filling the diagonal is 0.
 
 """
-function reconstruct_antisymmetric(m::Matrix{T}; diagonal_values=0) where T
+function reconstruct_antisymmetric(m::Matrix{T}; diagonal_values=0, fillwithnans::Bool=true) where T
 
     n_nodiag = length(m)
 
     N = (1+Integer(sqrt(1+8*n_nodiag)))÷2
-    M = zeros(T, N,N)
+    M = zeros(Float64, N,N)
 
     M[diagonal_indexes(M)] .= diagonal_values
 
@@ -183,7 +189,11 @@ function reconstruct_antisymmetric(m::Matrix{T}; diagonal_values=0) where T
         j = linear2tr_nodiag(c, N)[2]
 
         M[i,j] = m[c]
-        M[j,i] = m[c]*-1
+        if fillwithnans
+            M[j,i] = NaN
+        else
+            M[j,i] = m[c]*-1
+        end
     end
 
 

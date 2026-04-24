@@ -1,6 +1,6 @@
 name = "Squiggles"
 uuid = "d934da09-a6a1-40ff-a16a-ac00174578b4"
-version = "0.4.0"
+version = "0.5.0"
 authors = ["gbene <gabri.benedetti@gmail.com>", "Ylse Anna de Vries <yad2@hi.is>"]
 
 [workspace]
@@ -10,7 +10,6 @@ projects = ["docs", "tests/kernelabstractions", "tests/Plots", "tests/tr_index",
 GPUArrays = "0c68f7d7-f131-5f86-a1c3-88cf8149b2d7"
 KernelAbstractions = "63c18a36-062a-441e-b654-da1e3ab1ce7c"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
-Makie = "ee78f7c6-11fb-53f2-987a-cfe4a2b5a57a"
 StyledStrings = "f489334b-da3d-4c2e-b8f0-e476e12c162b"
 
 [weakdeps]

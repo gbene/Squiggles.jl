@@ -1,6 +1,7 @@
 using Squiggles
 using CUDA
 using GLMakie
+include("../plotters.jl")
 
 set_GPUbackend()
 
