@@ -8,23 +8,79 @@ We use KernelAbstractions.jl to run on any GPU supported by the JuliaGPU ecosyst
 
 ## Installation
 
-Open the Julia REPL and type either 
+### New to Julia?
 
-```julia 
-using Pkg; Pkg.add(url="git@github.com:gbene/Squiggles.jl.git")
+If you are new to Julia here is a quick setup guide to get you started!
+
+#### Install Julia
+
+[Click here](https://julialang.org/downloads/) for the full guide on the Julia website
+
+If on macOS or Linux type on a terminal
+
+```bash
+curl -fsSL https://install.julialang.org | sh
 ```
 
-or 
+If on Windows, either download the [installer](https://install.julialang.org/Julia.appinstaller) or run the following
 
-```julia 
-] add git@github.com:gbene/Squiggles.jl.git 
+```bash
+winget install --name Julia --id 9NJNWW8PVKMN -e -s msstore
 ```
 
-To use GPU acceleration you need to install the appropriate JuliaGPU package
+To check if the installation worked, type ```julia``` in a terminal. The following should appear
 
-+ ```] add CUDA```      -- CUDA cards
-+ ```] add Metal```     -- Apple silicon
-+ More to come!
+```bash
+
+   _       _ _(_)_     |  Documentation: https://docs.julialang.org
+  (_)     | (_) (_)    |
+   _ _   _| |_  __ _   |  Type "?" for help, "]?" for Pkg help.
+  | | | | | | |/ _` |  |
+  | | |_| | | | (_| |  |  Version 1.12.3 (2025-12-15)
+ _/ |\__'_|_|_|\__'_|  |  Official https://julialang.org release
+|__/                   |
+
+julia> 
+```
+
+
+#### Access the package manager
+
+The REPL is an interactive programming environment that can also be used to install new packages. To access the REPL type ```julia``` in the terminal.
+To access the package manager type ```]```. The input line should change from 
+
+```julia
+julia>
+```
+to
+
+```julia
+(@v1.12) pkg>
+```
+
+(depending on the version that you have the @v1.12 will change).
+
+### Install Squiggles
+
+Open the Julia REPL, enter the package manager using ```]``` and type
+
+```julia 
+add git@github.com:gbene/Squiggles.jl.git 
+```
+
+### Install GPU backends
+
+To use GPU acceleration, you need to install the appropriate JuliaGPU package depending on the card that you have available. As of now only CUDA.jl and Metal.jl (Apple Silicon) are available. To install type 
+
+```julia 
+add CUDA
+```
+
+or
+
+```julia 
+add Metal
+```
 
 
 

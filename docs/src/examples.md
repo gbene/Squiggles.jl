@@ -136,7 +136,7 @@ coeff_symm_fig, coeff_symm_ax = plotCC(coeffs_symm)
 display(corrn_fig)
 ```
 
-## 4. Using muliple GPUs
+## 4. Using multiple GPUs
 
 Squiggles has the possibility of running the [correlogram](@ref) and [norm_correlogram](@ref) functions on multiple GPUs. This is useful for example when it is necessary to chunk a big input or process muliple inputs at once. This is still an experimental feature.
 
