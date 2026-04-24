@@ -7,7 +7,7 @@ function diagonal_indexes(M::Matrix{T}) where {T}
 
     N = size(M)[1]
 
-    indexes = zeros(T, N)
+    indexes = zeros(Int32, N)
 
     for k in 0:N-1
         indexes[k+1] = 1+k*(N+1)
