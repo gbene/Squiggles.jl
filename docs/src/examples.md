@@ -10,7 +10,6 @@ Here are a couple of examples that can be run
 
 using Squiggles
 using CUDA
-using GLMakie
 
 set_GPUbackend() # Set the backend to GPU
 
@@ -43,7 +42,6 @@ coeffs = memcopy(coeffs_gpu)
 
 using Squiggles
 using CUDA
-using GLMakie
 
 set_GPUbackend() # Set the backend to GPU
 
@@ -85,7 +83,6 @@ To use a different GPU one can just change the imported julia package. For examp
 
 using Squiggles
 using Metal # <----- This changed
-using GLMakie
 
 set_GPUbackend() # Set the backend to GPU
 
