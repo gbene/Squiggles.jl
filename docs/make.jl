@@ -13,4 +13,4 @@ pages = ["Home" => "index.md",
 makedocs(sitename="Squiggles.jl", pages=pages, clean=true)
 
 
-deploydocs(repo="github.com:gbene/Squiggles.jl.git",devbranch="dev")
+deploydocs(repo="github.com:gbene/Squiggles.jl.git")
