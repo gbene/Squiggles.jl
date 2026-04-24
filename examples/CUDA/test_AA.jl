@@ -25,8 +25,8 @@ coeffs = memcopy(coeffs_gpu)
 lags = memcopy(lags_gpu)
 
 
-coeffs_symm = reconstruct_nodiag(coeffs)
-lags_symm = reconstruct_nodiag(lags)
+coeffs_symm = reconstruct_symmetric(coeffs)
+lags_symm = reconstruct_antisymmetric(lags)
 
 
 # correlograms = memcopy(correlograms_norm_full_gpu)

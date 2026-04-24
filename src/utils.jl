@@ -107,7 +107,7 @@ end
 
 
 """
-    reconstruct_nodiag(M)
+    reconstruct_symmetric(M; diagonal_values=1)
 
 Given a reduced matrix **m** of size N-1 x N/2 (for N even) or N X (N-1)/2 (for N odd), get a symmetrical matrix **M** of size N x N.
 
@@ -115,20 +115,25 @@ Given a reduced matrix **m** of size N-1 x N/2 (for N even) or N X (N-1)/2 (for 
 ### Arguments
 
 - `m::Matrix` -- Reduced matrix of N-1 x N/2 (for N even) or N X (N-1)/2 (for N odd).
+- `diagonal_values` -- Number used to fill the diagonal. Default is 1
 
 ### Output
 
 - `M::Matrix` -- Input matrix of NxN
 
+### Notes
+
+This function is mainly used after cross-correlation (A⋆A) to reconstruct a square matrix representation of the **cross correlation coefficients** in a lower triangular matrix form.
+Because of this, the default value for filling the diagonal is 1.
 """
-function reconstruct_nodiag(m::Matrix{T}) where T
+function reconstruct_symmetric(m::Matrix{T}; diagonal_values=1) where T
 
     n_nodiag = length(m)
 
     N = (1+Integer(sqrt(1+8*n_nodiag)))÷2
     M = zeros(T, N,N)
 
-    M[diagonal_indexes(M)] .= 1
+    M[diagonal_indexes(M)] .= diagonal_values
 
     for c in 1:n_nodiag
         i = linear2tr_nodiag(c, N)[1]
@@ -141,6 +146,50 @@ function reconstruct_nodiag(m::Matrix{T}) where T
 
     return M
 end
+
+"""
+    reconstruct_antisymmetric(M; diagonal_values=0)
+
+Given a reduced matrix **m** of size N-1 x N/2 (for N even) or N X (N-1)/2 (for N odd), get a anti-symmetrical matrix **M** of size N x N.
+
+
+### Arguments
+
+- `m::Matrix` -- Reduced matrix of N-1 x N/2 (for N even) or N X (N-1)/2 (for N odd).
+- `diagonal_values` -- Number used to fill the diagonal. Default is 0
+
+
+### Output
+
+- `M::Matrix` -- Input matrix of NxN
+
+### Notes
+
+This function is mainly used after cross-correlation (A⋆A) to reconstruct a square matrix representation of the **lags** in a lower triangle matrix form.
+Because of this, the default value for filling the diagonal is 0.
+
+"""
+function reconstruct_antisymmetric(m::Matrix{T}; diagonal_values=0) where T
+
+    n_nodiag = length(m)
+
+    N = (1+Integer(sqrt(1+8*n_nodiag)))÷2
+    M = zeros(T, N,N)
+
+    M[diagonal_indexes(M)] .= diagonal_values
+
+    for c in 1:n_nodiag
+        i = linear2tr_nodiag(c, N)[1]
+        j = linear2tr_nodiag(c, N)[2]
+
+        M[i,j] = m[c]
+        M[j,i] = m[c]*-1
+    end
+
+
+    return M
+end
+
 
 """
     normalize_columns(M)

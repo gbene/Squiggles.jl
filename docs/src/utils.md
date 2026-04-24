@@ -32,7 +32,10 @@ reduce_M_nodiag
 ```
 
 ```@docs
-reconstruct_nodiag
+reconstruct_symmetric
+```
+```@docs
+reconstruct_antisymmetric
 ```
 
 ```@docs

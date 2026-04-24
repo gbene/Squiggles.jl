@@ -268,7 +268,7 @@ If the sampling rate is provided then the lags will be in seconds
 function simplelags(correlograms::AbstractArray{T, 3}, τ::Integer) where T
     idx = findmax(abs, correlograms, dims=3)[2] # get the index of the absolute maximums
     coeffs = correlograms[idx]
-    lags = map(x -> x[3] .- τ, idx) # the lags are the index - the amount of lag used
+    lags = map(x -> (x[3].-1) .- τ, idx) # the lags are the index - the amount of lag used
 
     return dropdims(coeffs, dims=3), dropdims(lags, dims=3)
 end
