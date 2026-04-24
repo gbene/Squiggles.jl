@@ -1,4 +1,4 @@
-name: Dev documentation
+name: Master documentation
 
 on:
   workflow_dispatch:
