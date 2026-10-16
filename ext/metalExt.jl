@@ -29,22 +29,8 @@ module metalExt
     function memcopy(A::AbstractArray{T, N}, dev_id::Int=0) where {T, N}
         mem = used_backend().memory
 
-        prev_dev = device() # save current device
-
-        if prev_dev.handle != dev_id
-            # @info styled"Switching to device {bold:$(dev_id)}"
-
-            device!(dev_id) # change to selected device
-
-            A_mtl = MtlArray{T, N, mem}(A) # move to memory
-
-            # @info styled"Switching back to orginal device {bold:$(prev_dev.handle)}"
-            device!(prev_dev) # change back to starting device
-            return A_mtl
-        else
-            A_mtl = MtlArray{T, N, mem}(A) # move to memory
-            return A_mtl
-        end
+        A_mtl = MtlArray{T, N, mem}(A) # move to memory
+        return A_mtl
     end
 
 end
