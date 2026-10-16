@@ -17,7 +17,7 @@ include("kernels.jl")
 include("correlate.jl")
 
 
-const supported_GPU_platforms  = ["CUDA"]
+const supported_GPU_platforms  = ["CUDA","Metal"]
 const supported_platforms = ["CPU", supported_GPU_platforms...]
 const global_settings = Dict{String, Any}("backend"=>CPUBackend())
 
