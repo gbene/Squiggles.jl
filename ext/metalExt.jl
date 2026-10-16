@@ -1,4 +1,4 @@
-module cudaExt
+module metalExt
 
     using Metal
     using Squiggles
