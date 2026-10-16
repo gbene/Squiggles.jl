@@ -21,7 +21,7 @@ module metalExt
 
 
 
-        global_settings["backend"] = backend
+        Squiggles.global_settings["backend"] = backend
         return nothing
     end
 
