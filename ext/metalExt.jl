@@ -27,7 +27,7 @@ module metalExt
 
 
     function memcopy(A::AbstractArray{T, N}, dev_id::Int=0) where {T, N}
-        mem = get_backend().memory
+        mem = used_backend().memory
 
         prev_dev = device() # save current device
 
