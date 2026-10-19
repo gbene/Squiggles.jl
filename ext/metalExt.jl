@@ -31,7 +31,7 @@ module metalExt
 
         A = Float32.(A) #Downcast to Float32 since Metal does not support Float64
 
-        A_mtl = MtlArray{T, N, mem}(A) # move to memory
+        A_mtl = MtlArray{Float32, N, mem}(A) # move to memory
         return A_mtl
     end
 
