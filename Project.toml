@@ -1,6 +1,6 @@
 name = "Squiggles"
 uuid = "d934da09-a6a1-40ff-a16a-ac00174578b4"
-version = "0.5.5"
+version = "0.5.6"
 authors = ["gbene <gabri.benedetti@gmail.com>", "Ylse Anna de Vries <yad2@hi.is>"]
 
 [workspace]
@@ -23,3 +23,4 @@ metalExt = "Metal"
 
 [compat]
 julia = "1.11"
+GPUArrays = "11.5.15"
