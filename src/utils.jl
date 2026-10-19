@@ -33,7 +33,7 @@ https://atrebas.github.io/post/2021-01-17-index_to_lower_triangular_subscripts/
 function linear2tr_nodiag(k::Integer, n::Integer)
 
     kp = n * (n - Int32(1)) ÷ Int32(2) - k
-    p = floor(Int32, ( Int32(sqrt(Int32(1) + Int32(8) * kp)) - Int32(1) ) / Int32(2) )
+    p = floor(Int32, ( sqrt(Int32(Int32(1) + Int32(8) * kp)) - Int32(1) ) / Int32(2) )
 
     i = n - (kp - p * (p + Int32(1)) ÷ Int32(2))
     j = n - Int32(1) - p
