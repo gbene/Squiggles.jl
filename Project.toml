@@ -4,7 +4,7 @@ version = "0.5.10"
 authors = ["gbene <gabri.benedetti@gmail.com>", "Ylse Anna de Vries <yad2@hi.is>"]
 
 [workspace]
-projects = ["docs", "prototyping/kernelabstractions", "prototyping/Plots", "prototyping/tr_index", "prototyping/macros", "examples/CUDA", "benchmarks", "tests"]
+projects = ["docs", "prototyping/kernelabstractions", "prototyping/Plots", "prototyping/tr_index", "prototyping/macros", "examples/CUDA", "examples/Metal", "benchmarks", "tests"]
 
 [deps]
 GPUArrays = "0c68f7d7-f131-5f86-a1c3-88cf8149b2d7"
