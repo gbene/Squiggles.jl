@@ -29,6 +29,8 @@ module metalExt
     function memcopy(A::AbstractArray{T, N}, dev_id::Int=0) where {T, N}
         mem = used_backend().memory
 
+        A = Float32.(A) #Downcast to Float32 since Metal does not support Float64
+
         A_mtl = MtlArray{T, N, mem}(A) # move to memory
         return A_mtl
     end
