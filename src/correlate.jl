@@ -32,6 +32,7 @@ As of now only signals that have n samples as a power of 2 can be used. If this 
 function correlogram(A::AbstractArray{T}, B::AbstractArray{T}, τ::Integer, threads_per_block::Integer; device::Integer=0) where T
     assert_input(A)
     assert_input(B)
+    τ = Int32(τ)
 
     n_signals = size(A, 2)
     m_signals = size(B, 2)
@@ -68,6 +69,7 @@ end
 
 function correlogram(A::AbstractArray{T}, τ::Integer, threads_per_block::Integer; device::Integer=0) where T
     assert_input(A)
+    τ = Int32(τ)
 
     n_signals = size(A, 2)
     n_samples = size(A, 1)
@@ -121,6 +123,7 @@ function correlogram!(correlograms::AbstractArray{T, 3}, A::AbstractArray{T}, B:
     assert_input(A)
     assert_input(B)
 
+    τ = Int32(τ)
 
     n_samples = size(A, 1)
 
@@ -137,6 +140,7 @@ end
 
 function correlogram!(correlograms::AbstractArray{T, 3}, A::AbstractArray{T}, τ::Integer, threads_per_block::Integer) where T
     assert_input(A)
+    τ = Int32(τ)
 
     n_samples = size(A, 1)
 
