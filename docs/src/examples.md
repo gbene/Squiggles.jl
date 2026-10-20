@@ -84,7 +84,7 @@ To use a different GPU one can just change the imported julia package. For examp
 using Squiggles
 using Metal # <----- This changed
 
-set_GPUbackend() # Set the backend to GPU
+set_GPUbackend() # Set the backend to GPU. Note that Metal GPUs do not support Float64 (double) precision. Any Float64 inputs will be casted to Float32.  
 
 i = 10
 

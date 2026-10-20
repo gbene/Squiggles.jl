@@ -5,7 +5,7 @@ The code is designed around the idea of providing a generalized kernel that can 
 the kernels. 
 
 
-## Assumptions
+## Assumptions and caveats
 
 As of now there are two main assumptions:
 
@@ -13,7 +13,9 @@ As of now there are two main assumptions:
 2. Signals must have a power of 2 n of samples.
 
 
-This is caused both by present limitations in KernelAbstractions (i.e. it is not possible to define dynamic shared memory) and by the fact that power of two elements work nicely with thread scheduling in GPUs. Because of this, 6 kernels are provided that are chosen depending on the length of the signals.   
+This is caused both by present limitations in KernelAbstractions (i.e. it is not possible to define dynamic shared memory) and by the fact that power of two elements work nicely with thread scheduling in GPUs. Because of this, 6 kernels are provided that are chosen depending on the length of the signals.
+
+With Metal GPUs (apple silicon chips), Float64 (double) precision is not supported. Thus any input of type Float64 is casted to Float32, all other inputs types (e.g. Float16 or Float8) do not change.
 
 
 ## Kernel design
@@ -53,9 +55,9 @@ Thus the (normalized) correlation coefficient and lag matrices (**(N)CC**, **L**
 
 ### Kernel description
 
-Each i,j correlation is independent from the others thus each ith, jth signal pair can be processed in parallel. Moreover, correlation in the end a sliding dot product where each dot product is independent from the other. Thus, for each signal pair there are n lags operations ($n_l$) that can also be carried out in parallel.
+Each $i,j$ correlation is independent from the others thus each ith, jth signal pair can be processed in parallel. Correlation is a sliding dot product where each dot product is independent from the other. Thus, for each signal pair there are n lags operations ($n_l$) that can also be carried out in parallel.
 
-The inputs must be structured such that each signal corresponds to a column of the input matrix. $i$x$j$ blocks are lunched as a 2D grid (i.e. using 2D indexing) where the **x** block index represents the columns of matrix **F**, while the **y** block index represents the columns of matrix **G**.  
+The inputs must be structured such that each signal corresponds to a column of the input matrix. $i$ x $j$ blocks are lunched as a 2D grid (i.e. using 2D indexing) where the **x** block index represents the columns of matrix **F**, while the **y** block index represents the columns of matrix **G**.  
 
 Each block has a certain amount of threads that carry out two tasks. First, each thread reads and loads in parallel each element of vectors $f^x$ and $g^y$ to shared memory.  Once all data is loaded, the same threads carry out the sliding dot product. Each thread is responsible for calculating one or more lagged dot products (using grid striding if necessary) and to save the dot product result to the output.
 

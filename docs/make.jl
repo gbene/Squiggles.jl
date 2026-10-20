@@ -2,7 +2,7 @@ using Documenter, Squiggles, CairoMakie
 
 pages = ["Home" => "index.md",
          "Examples" => "examples.md",
-         "Code design" => "code.md",
+         "Code design and limitations" => "code.md",
          "Correlograms, coefficients and lags" => "correlate.md",
          "Available kernels" => "kernels.md",
          "Utilities" => "utils.md",
