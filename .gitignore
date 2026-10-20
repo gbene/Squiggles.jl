@@ -1,5 +1,5 @@
 Manifest.toml
 LocalPreferences.toml
 .fuse*
-*.jld2
+benchmarks/data/*.jld2
 *.mat

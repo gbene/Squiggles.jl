@@ -17,8 +17,9 @@ module metalExt
         else
             error(styled"Memory {bold:$mem} type not recognized")
         end
-        @info styled"METAL with {bold:$(backend.memory)} will now be used"
-
+        @info styled"METAL with {bold:$(backend.memory)} will now be used."
+        @info styled"{bold:NOTE: } Metal GPUs do not support Float64 (double) precision. Inputs with Float64 precision that are transferred to Metal GPUs will be casted to Float32"
+        @info styled"{bold:NOTE: } Multiple Metal GPUs are not supported"
 
 
         Squiggles.global_settings["backend"] = backend
@@ -29,9 +30,13 @@ module metalExt
     function memcopy(A::AbstractArray{T, N}, dev_id::Int=0) where {T, N}
         mem = used_backend().memory
 
-        A = Float32.(A) #Downcast to Float32 since Metal does not support Float64
+        # if T == Float64
+        #     A = Float32.(A) #Downcast to Float32 since Metal does not support Float64
+        # end
 
-        A_mtl = MtlArray{Float32, N, mem}(A) # move to memory
+        NT = T == Float64 ? Float32 : T #Downcast to Float32 since Metal does not support Float64, else leave the type as is
+
+        A_mtl = MtlArray{NT, N, mem}(A) # move to memory
         return A_mtl
     end
 
