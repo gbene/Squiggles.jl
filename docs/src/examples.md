@@ -114,7 +114,7 @@ lags_symm = reconstruct_nodiag(lags)
 
 ## 4. Using multiple GPUs
 
-Squiggles has the possibility of running the [correlogram](@ref `Squiggles.correlogram`) and [norm_correlogram](@ref `Squiggles.norm_correlogram`) functions on multiple GPUs. This is useful for example when it is necessary to chunk a big input or process muliple inputs at once. This is still an experimental feature.
+Squiggles has the possibility of running the [correlogram](@ref `Squiggles.correlogram`) and [norm_correlogram](@ref `Squiggles.norm_correlogram`) functions on multiple GPUs. This is useful for example when it is necessary to chunk a big input or process multiple inputs at once. This is still an experimental feature.
 
 
 ```julia

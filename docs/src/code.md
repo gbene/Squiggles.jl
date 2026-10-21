@@ -15,7 +15,7 @@ As of now there are two main assumptions:
 
 This is caused both by present limitations in KernelAbstractions (i.e. it is not possible to define dynamic shared memory) and by the fact that power of two elements work nicely with thread scheduling in GPUs. Because of this, 6 kernels are provided that are chosen depending on the length of the signals.
 
-With Metal GPUs (apple silicon chips), Float64 (double) precision is not supported. Thus any input of type Float64 is casted to Float32, all other inputs types (e.g. Float16 or Float8) do not change.
+With Metal GPUs (apple silicon chips), Float64 (double) precision is not supported. Thus any input of type Float64 is casted to Float32, all other inputs types (e.g. Float16) do not change.
 
 
 ## Kernel design

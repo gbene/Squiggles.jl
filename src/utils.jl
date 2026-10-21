@@ -263,6 +263,9 @@ function assert_input(A::AbstractArray)
 
     @assert ispow2(size(A,1)) "Cannot use signal lengths that are not power of 2!"
 
+    if eltype(A) == Float64 && used_backend() == "Metal"
+        @info styled"{bold:NOTE: } Metal GPUs do not support Float64 (double) precision. Inputs with Float64 precision will be casted to Float32"
+    end
 end
 
 """
@@ -285,6 +288,10 @@ Preallocate the inputs for [`correlogram!`](@ref), [`norm_correlogram!`](@ref) a
 - `c_GPU::AbstractGPUArray{T, 3}` -- Empty correlogram volume pointer on the device
 - `coeffs_GPU::AbstractGPUArray{T}` -- Empty correlation coefficient matrix pointer on the device
 - `lags_GPU::AbstractGPUArray{T}` -- Empty lag matrix pointer on the device
+
+### Notes
+
+If Metal GPUs are used `Float64` precision is not supported. If the input matrices elements are of `Float64` type, casting to `Float32` is performed.
 """
 function prepare_inputs(A::AbstractArray{T}, B::AbstractArray{T}, τ::Integer; device::Integer=0) where T
 

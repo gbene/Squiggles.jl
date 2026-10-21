@@ -18,7 +18,7 @@ module metalExt
             error(styled"Memory {bold:$mem} type not recognized")
         end
         @info styled"METAL with {bold:$(backend.memory)} will now be used."
-        @info styled"{bold:NOTE: } Metal GPUs do not support Float64 (double) precision. Inputs with Float64 precision that are transferred to Metal GPUs will be casted to Float32"
+        @info styled"{bold:NOTE: } Metal GPUs do not support Float64 (double) precision. Inputs with Float64 precision will be casted to Float32"
         @info styled"{bold:NOTE: } Multiple Metal GPUs are not supported"
 
 
