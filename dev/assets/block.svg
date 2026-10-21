@@ -8,7 +8,7 @@
    height="592.54724"
    viewBox="0 0 1204.0563 592.54724"
    sodipodi:docname="block.svg"
-   inkscape:version="1.4.3 (1:1.4.3+202512261035+0d15f75042)"
+   inkscape:version="1.4.4 (1:1.4.4+202605061436+dcaf3e7d9e)"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
@@ -23,8 +23,8 @@
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#d1d1d1"
      inkscape:zoom="0.66450004"
-     inkscape:cx="849.51086"
-     inkscape:cy="307.75017"
+     inkscape:cx="578.63051"
+     inkscape:cy="548.5327"
      inkscape:window-width="1920"
      inkscape:window-height="1011"
      inkscape:window-x="1920"
@@ -522,10 +522,6 @@
            style="font-variant:normal;font-weight:normal;font-size:12.147px;font-family:'DejaVu Sans';writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
            x="0"
            y="0">9</tspan></text>
-      <text
-         id="text83"
-         xml:space="preserve"
-         transform="matrix(0,1.3333333,-1.3333333,0,1243.1,289.13753)">To output volume (1,1,thread_id)</text>
       <text
          id="text87"
          xml:space="preserve"
@@ -1208,5 +1204,11 @@
     <g
        id="g144"
        transform="matrix(0.34643285,0,0,0.34643285,983.13853,216.1209)" />
+    <text
+       id="text83"
+       xml:space="preserve"
+       transform="matrix(0,1.3333333,-1.3333333,0,1212.0437,243.13753)"><tspan
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'DejaVu Sans';-inkscape-font-specification:'DejaVu Sans'"
+         id="tspan1">To output volume (1,1,thread_id)</tspan></text>
   </g>
 </svg>
