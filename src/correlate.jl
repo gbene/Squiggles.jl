@@ -298,7 +298,7 @@ This assumes that the inputs are already moved to the device, use [`prepare_inpu
 function simplelags!(coeffs::AbstractArray{T}, lags::AbstractArray{T}, correlograms::AbstractArray{T, 3}, τ::Integer) where T
     idx = findmax(abs, correlograms, dims=3)[2] # get the index of the absolute maximums
     coeffs .= correlograms[idx]
-    map!(x -> x[3] .- τ, lags, idx) # the lags are the index - the amount of lag used
+    map!(x -> (x[3].-1) .- τ, lags, idx) # the lags are the index - the amount of lag used
 
 end
 
